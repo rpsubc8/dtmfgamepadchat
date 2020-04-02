@@ -7,6 +7,7 @@
 // # - Comienzo sms
 //   - 
 // * - Fin sms 
+const const_max_length_sms = 64; //128 caracters maximos para un sms
 
 var id_stq,id_q4,id_q3,id_q2,id_q1;
 var value_stq,value_q4,value_q3,value_q2,value_q1;
@@ -17,30 +18,38 @@ var stq_antes=0;
 var dato=0;
 var gb_cadDTMF='';
 
-var areaRX;
+var gb_ctrl_areaRX;
 var gb_forceDraw = false;
-var cad_areaRX = '';
+var gb_cad_areaRX = '';
+var gb_ctrl_areaTX;
+var gb_ctrl_btnTabPAD;
+var gb_ctrl_btnTabRX;
 
-var input_stq;
-var input_q4;
-var input_q3;
-var input_q2;
-var input_q1;
-var btnBotones;
+//var gb_ctrl_btnPruebaSendDTMF;
+var gb_ctrl_btnPruebaSendSMS0;
+var gb_ctrl_btnPruebaSendTX0;
+var gb_ctrl_btnPruebaSendSMS1;
+
+var gb_ctrl_input_stq;
+var gb_ctrl_input_q4;
+var gb_ctrl_input_q3;
+var gb_ctrl_input_q2;
+var gb_ctrl_input_q1;
+var gb_btnLoadBtnPAD; //Cargar Botones PAD
 var btnClear;
 var gb_cad_botones='';
 
 var gb_oscTone1;
 var gb_oscTone2;
-var gb_current_array_dtmf_send = 0;
-var gb_total_array_dtmf_send = 0;
+var gb_current_dtmf_send = 0;
+var gb_total_dtmf_send = 0;
 var gb_buf_send_dtmf = '';
-var gb_play_array_dtmf= false;
+var gb_play_dtmf= false;
 var gb_begin_dtmf = false;
 var gb_end_dtmf = false;
 var gb_begin_silence = false;
 var gb_end_silence = false;
-var gb_ini_dtmf;
+var gb_ini_dtmf;  //Milisegundos inicial
 
 var gb_mic, gb_fft;
 var gb_fft_dtmf='';
@@ -66,11 +75,13 @@ function setup() {
   textFont('Courier');
   textSize(20);
 
-  areaRX = createElement('textarea');
-  areaRX.position(20,10);
-  areaRX.style('width','800px');
-  areaRX.style('height','160px');
-  areaRX.elt.placeholder='';
+  gb_ctrl_areaRX = createElement('textarea');
+  gb_ctrl_areaRX.position(20,10);
+  gb_ctrl_areaRX.style('width','800px');
+  gb_ctrl_areaRX.style('height','300px');
+  gb_ctrl_areaRX.elt.value='';
+  gb_ctrl_areaRX.elt.placeholder='';
+  gb_ctrl_areaRX.elt.readOnly = true;
      
   value_stq= value_q4= value_q3= value_q2 = value_q1 = 0;
   //value_stq_antes = value_q4_antes = value_q3_antes = value_q2_antes = value_q1_antes = 0;  
@@ -82,60 +93,61 @@ function setup() {
   id_q1 = 10;
  
 
-  btnBotones = createButton('Botones');
-  btnBotones.position(220,190);
-  btnBotones.mousePressed(LoadBotones);
+  gb_btnLoadBtnPAD = createButton('Botones');
+  gb_btnLoadBtnPAD.position(220,190);
+  gb_btnLoadBtnPAD.mousePressed(LoadBotones);
   
   btnClear = createButton('Clear');
-  btnClear.position(220, 220);
+  btnClear.position(720, 380);
   btnClear.mousePressed(ClearDtmf);
    
   btnStop = createButton('Stop');
-  btnStop.position(220, 250);
+  btnStop.position(720, 410);
   btnStop.mousePressed(StopSound);
     
-  btnPruebaSendDTMF = createButton('Send');
-  btnPruebaSendDTMF.position(220, 290);
-  btnPruebaSendDTMF.mousePressed(PruebaSendDTMF);
+  //gb_ctrl_btnPruebaSendDTMF = createButton('Send');
+  //gb_ctrl_btnPruebaSendDTMF.position(220, 290);
+  //gb_ctrl_btnPruebaSendDTMF.mousePressed(PruebaSendDTMF);
   
-  btnPruebaSendDTMF = createButton('SendSMS0');
-  btnPruebaSendDTMF.position(320, 290);
-  btnPruebaSendDTMF.mousePressed(function(){SendSMSTipo0('HOLA')});
+  gb_ctrl_btnPruebaSendSMS0 = createButton('SendSMS0');
+  gb_ctrl_btnPruebaSendSMS0.position(720, 320);
+  gb_ctrl_btnPruebaSendSMS0.mousePressed(function(){SendSMSTipo0('HOLA')});
     
-  areaTX = createElement('textarea');
-  areaTX.position(620,190);
-  areaTX.style('width','200px');
-  areaTX.style('height','70px');
-  areaTX.elt.placeholder='';
+  gb_ctrl_areaTX = createElement('textarea');
+  gb_ctrl_areaTX.position(20,320);
+  gb_ctrl_areaTX.style('width','540px');
+  gb_ctrl_areaTX.style('height','30px');
+  gb_ctrl_areaTX.elt.maxLength = const_max_length_sms;
+  gb_ctrl_areaTX.elt.placeholder='';
   
-  btnPruebaSendDTMF = createButton('TX0');
-  btnPruebaSendDTMF.position(620, 290);
-  btnPruebaSendDTMF.mousePressed(PruebaSendTXSMSTipo0);	
+  gb_ctrl_btnPruebaSendTX0 = createButton('Send TX0');
+  gb_ctrl_btnPruebaSendTX0.position(580, 330);
+  gb_ctrl_btnPruebaSendTX0.mousePressed(PruebaSendTXSMSTipo0);	
   
-  btnPruebaSendDTMF = createButton('SendSMS1');
-  btnPruebaSendDTMF.position(420, 290);
-  btnPruebaSendDTMF.mousePressed(PruebaSendSMSTipo1);
+  gb_ctrl_btnPruebaSendSMS1 = createButton('SendSMS1');
+  gb_ctrl_btnPruebaSendSMS1.position(720, 350);
+  gb_ctrl_btnPruebaSendSMS1.mousePressed(PruebaSendSMSTipo1);
   
 
-  input_stq = createInput();
-  input_stq.position(60, 190);
-  input_stq.elt.value = id_stq.toString();
+  gb_ctrl_input_stq = createInput();
+  gb_ctrl_input_stq.position(60, 190);
+  gb_ctrl_input_stq.elt.value = id_stq.toString();
 
-  input_q4 = createInput();
-  input_q4.position(60, 220);
-  input_q4.elt.value = id_q4.toString();
+  gb_ctrl_input_q4 = createInput();
+  gb_ctrl_input_q4.position(60, 220);
+  gb_ctrl_input_q4.elt.value = id_q4.toString();
 
-  input_q3 = createInput();
-  input_q3.position(60, 250);
-  input_q3.elt.value = id_q3.toString();
+  gb_ctrl_input_q3 = createInput();
+  gb_ctrl_input_q3.position(60, 250);
+  gb_ctrl_input_q3.elt.value = id_q3.toString();
   
-  input_q2 = createInput();
-  input_q2.position(60, 280);
-  input_q2.elt.value = id_q2.toString();
+  gb_ctrl_input_q2 = createInput();
+  gb_ctrl_input_q2.position(60, 280);
+  gb_ctrl_input_q2.elt.value = id_q2.toString();
   
-  input_q1 = createInput();
-  input_q1.position(60, 310);
-  input_q1.elt.value = id_q1.toString();
+  gb_ctrl_input_q1 = createInput();
+  gb_ctrl_input_q1.position(60, 310);
+  gb_ctrl_input_q1.elt.value = id_q1.toString();
       
 	  
   gb_oscTone1 = new p5.Oscillator();
@@ -157,7 +169,16 @@ function setup() {
    gb_fft = new p5.FFT();
    gb_fft.setInput(gb_mic);  
   }
+
+  gb_ctrl_btnTabRX = createButton('TABRX');
+  gb_ctrl_btnTabRX.position(10,400);
+  gb_ctrl_btnTabRX.mousePressed(SelectTabRX);
   
+  gb_ctrl_btnTabPAD = createButton('TABPAD');
+  gb_ctrl_btnTabPAD.position(80,400);
+  gb_ctrl_btnTabPAD.mousePressed(SelectTabPAD);  
+
+  SelectTabRX(); //Seleccion Recepcion
 	  
   gb_forceDraw = true;  
 }
@@ -167,27 +188,27 @@ function PlayDTMF(data)
 {   
   //gb_buf_send_dtmf[0] = data;
   gb_buf_send_dtmf = data;
-  gb_total_array_dtmf_send= 0;
-  gb_current_array_dtmf_send = 0;
-  gb_play_array_dtmf= true;
+  gb_total_dtmf_send= 0;
+  gb_current_dtmf_send = 0;
+  gb_play_dtmf= true;
   gb_begin_dtmf = false;
   gb_end_dtmf = false;
   gb_begin_silence = false;
   gb_end_silence = false;
 }
 
-
+//Para reproducir sonidos DTMF
 function StopSound(){
  gb_oscTone1.stop();
  gb_oscTone2.stop();
- gb_play_array_dtmf = false;
+ gb_play_dtmf = false;
 }
 
 function ClearDtmf(){
- cad_areaRX='';
- gb_forceDraw = true;
- 
- alert(StringTo2KeyDTMF('esto es una prueba'));
+ gb_ctrl_areaRX.elt.value ='';
+ gb_cad_areaRX='';
+ gb_forceDraw = true; 
+ //alert(StringTo2KeyDTMF('esto es una prueba'));
 }
 
 //Convierte caracter Base64 A..Z a codigo decimal 0..63
@@ -343,14 +364,14 @@ function DTMFtoCharBase64(dtmf)
 //Envia un mensaje del TextMemo
 function PruebaSendTXSMSTipo0()
 {
- let cadToSend = areaTX.elt.value;
+ let cadToSend = gb_ctrl_areaTX.elt.value;
  SendSMSTipo0(cadToSend);
 }
 
 //Actualiza la area de recepcion que tambien pone TX
 function UpdateAreaRX(cad)
 {
- areaRX.elt.value += cad+'\n';
+ gb_ctrl_areaRX.elt.value += cad+'\n';
 }
 
 //Send SMS de Prueba basica tipo 0 sin longitud ni CRC
@@ -368,14 +389,15 @@ function SendSMSTipo0(cadToSend)
  let encodedString = btoa(cadToSend); //Base64  
  cadLog += new Date(Date.now()).toLocaleString('en-GB').replace(',','');
  cadTX = cadLog;
- cadLog += ' TX '+cadToSend+' BASE64:'+encodedString;
+ cadLog += ' TX '+cadToSend+' Len:'+cadToSend.length.toString();
+ cadLog += ' BASE64:'+encodedString+ ' Len:'+encodedString.length.toString();
  let cadDTMF = '';
  let i=0;
  for (i=0;i<encodedString.length;i++)
  {	 
   cadDTMF += CharBase64To2DTMF(encodedString[i]);
  }
- cadLog += ' DTMF:' + cadDTMF;
+ cadLog += ' DTMF:' + cadDTMF+' Len:'+cadDTMF.length.toString();
  console.log(cadLog); 
  
  cadTX+=' TX:'+cadToSend;
@@ -391,9 +413,9 @@ function SendSMSTipo0(cadToSend)
  
 
  
- gb_total_array_dtmf_send= frameData.length+1;
- gb_current_array_dtmf_send = 0;
- gb_play_array_dtmf= true;
+ gb_total_dtmf_send= frameData.length+1;
+ gb_current_dtmf_send = 0;
+ gb_play_dtmf= true;
  gb_begin_dtmf = false;
  gb_end_dtmf = false;
  gb_begin_silence = false;
@@ -417,59 +439,48 @@ function PruebaSendSMSTipo1()
  //gb_buf_send_dtmf[(cadSend.length+1)]='*'; 
  gb_buf_send_dtmf += '*'; 
  
- gb_total_array_dtmf_send= cadSend.length+1;
- gb_current_array_dtmf_send = 0;
- gb_play_array_dtmf= true;
+ gb_total_dtmf_send= cadSend.length+1;
+ gb_current_dtmf_send = 0;
+ gb_play_dtmf= true;
  gb_begin_dtmf = false;
  gb_end_dtmf = false;
  gb_begin_silence = false;
  gb_end_silence = false; 
 }
 
-function PruebaSendDTMF(){
- //gb_oscTone1.start();
- //gb_oscTone2.start();
- //let cadSend='0123456789ABCD*#' 
- //let cadSend=StringTo2KeyDTMF('Prueba');
- let cadSend=StringTo2KeyDTMF('Esto es una prueba'); 
- //alert(cadSend);
- let i=0;
- //gb_buf_send_dtmf[0]='#';
- gb_buf_send_dtmf = '#';
- for (i=1;i<=cadSend.length;i++){
-  //gb_buf_send_dtmf[i] = cadSend[(i-1)];
-  gb_buf_send_dtmf += cadSend[(i-1)];
- }
- //gb_buf_send_dtmf[(cadSend.length+1)]='#';
- gb_buf_send_dtmf += '#';
- 
- //alert(gb_array_dtmf);
- //gb_array_dtmf[0]='3';
- //gb_array_dtmf[1]='B';
- //gb_array_dtmf[2]='7';
- //gb_array_dtmf[3]='D';
- //gb_array_dtmf[4]='8';
- //gb_array_dtmf[5]='A';
- //gb_array_dtmf[6]='6';
- 
- //3B7D8A6C1A3B7D1A8B6B2A1A7A7C8B3B2B2A
- 
- gb_total_array_dtmf_send= cadSend.length+1;
- gb_current_array_dtmf_send = 0;
- gb_play_array_dtmf= true;
- gb_begin_dtmf = false;
- gb_end_dtmf = false;
- gb_begin_silence = false;
- gb_end_silence = false;
-}
+//function PruebaSendDTMF(){
+// //gb_oscTone1.start();
+// //gb_oscTone2.start();
+// //let cadSend='0123456789ABCD*#' 
+// //let cadSend=StringTo2KeyDTMF('Prueba');
+// let cadSend=StringTo2KeyDTMF('Esto es una prueba'); 
+// //alert(cadSend);
+// let i=0;
+// //gb_buf_send_dtmf[0]='#';
+// gb_buf_send_dtmf = '#';
+// for (i=1;i<=cadSend.length;i++){
+//  //gb_buf_send_dtmf[i] = cadSend[(i-1)];
+//  gb_buf_send_dtmf += cadSend[(i-1)];
+// }
+// //gb_buf_send_dtmf[(cadSend.length+1)]='#';
+// gb_buf_send_dtmf += '#';
+// //3B7D8A6C1A3B7D1A8B6B2A1A7A7C8B3B2B2A 
+// gb_total_dtmf_send= cadSend.length+1;
+// gb_current_dtmf_send = 0;
+// gb_play_dtmf= true;
+// gb_begin_dtmf = false;
+// gb_end_dtmf = false;
+// gb_begin_silence = false;
+// gb_end_silence = false;
+//}
 
 
 function LoadBotones(){ 
- id_stq = Number(input_stq.elt.value);
- id_q4 = Number(input_q4.elt.value);
- id_q3 = Number(input_q3.elt.value);
- id_q2 = Number(input_q2.elt.value);
- id_q1 = Number(input_q1.elt.value);
+ id_stq = Number(gb_ctrl_input_stq.elt.value);
+ id_q4 = Number(gb_ctrl_input_q4.elt.value);
+ id_q3 = Number(gb_ctrl_input_q3.elt.value);
+ id_q2 = Number(gb_ctrl_input_q2.elt.value);
+ id_q1 = Number(gb_ctrl_input_q1.elt.value);
 }
 
 function NumberToDTMFString(valor){
@@ -602,9 +613,10 @@ function StopSoundDTMF(){
  gb_oscTone2.stop();
 }
 
+//Tarjeta de Sonido
 function Poll_DTMFSound(){
  let valor='';
- if (gb_play_array_dtmf === true){  
+ if (gb_play_dtmf === true){  
   if (gb_begin_dtmf === false){
    gb_ini_dtmf = millis();
    gb_begin_dtmf = true;
@@ -615,7 +627,7 @@ function Poll_DTMFSound(){
    gb_oscTone2.stop();
    let baja= 0;
    let alta= 0;  
-   valor = gb_buf_send_dtmf[gb_current_array_dtmf_send];  
+   valor = gb_buf_send_dtmf[gb_current_dtmf_send];  
    switch (valor){
     case '1': baja= 697; alta= 1209; break;
     case '2': baja= 697; alta= 1336; break;
@@ -648,12 +660,13 @@ function Poll_DTMFSound(){
 	 gb_begin_dtmf = false;
      gb_end_dtmf = false;
      gb_begin_silence = false;
-     gb_end_silence = false;
-	 gb_current_array_dtmf_send++;
-	 if (gb_current_array_dtmf_send > gb_total_array_dtmf_send){
-	  gb_current_array_dtmf_send= 0;
+     gb_end_silence = false;	 
+	 gb_current_dtmf_send++;
+	 if (gb_current_dtmf_send > gb_total_dtmf_send){
+	  gb_current_dtmf_send= 0;
       StopSoundDTMF();
-	  gb_play_array_dtmf = false;
+	  gb_play_dtmf = false;
+	  gb_forceDraw = true; //borra visual tx
 	 }
 	}
    }
@@ -727,7 +740,7 @@ function Poll_FFT_DTMF(){
    gb_cadDTMF = gb_fft_dtmf;
    if (gb_fft_dtmf_antes != gb_fft_dtmf){	
     gb_fft_dtmf_antes = gb_fft_dtmf;
-    cad_areaRX += gb_fft_dtmf;	
+    gb_cad_areaRX += gb_fft_dtmf;	
 	gb_buf_rcv_dtmf += gb_fft_dtmf;
 	gb_event_new_data_dtmf = true;
 	if (gb_fft_dtmf === '#'){
@@ -813,7 +826,7 @@ function Poll_Pad_DTMF(){
  
  if (value_stq != stq_antes){
   if ((stq_antes === 0) && (value_stq === 1)){   
-   cad_areaRX += gb_cadDTMF;
+   gb_cad_areaRX += gb_cadDTMF;
    
    gb_buf_rcv_dtmf += gb_cadDTMF;
    gb_event_new_data_dtmf = true;
@@ -827,9 +840,10 @@ function Poll_Pad_DTMF(){
  }	
 }
 
-//Dibuja los datos principales en Pantalla
+//Dibuja los datos principales en Pantalla del gamepad
 function PollDibujaDatos()
 {
+ let cadTX='';
  if (gb_forceDraw === true)
  {
   gb_forceDraw = false;
@@ -851,10 +865,22 @@ function PollDibujaDatos()
    text('q2', 10, 300);
    text('q1', 10, 330);   
   }
-  text('dato: '+dato, 160, 380);
-  text('DTMF: '+gb_cadDTMF,160,400);
-  text(cad_areaRX,10,360);
-  //areaRX.elt.value = cad_areaRX;    
+  text('dato: '+dato, 580, 370);
+  text('DTMF: '+gb_cadDTMF,580,390);
+  if (gb_cad_areaRX.length > 30)
+  {
+   gb_cad_areaRX ='';
+  }
+  text(gb_cad_areaRX,10,380);
+  //gb_ctrl_areaRX.elt.value = gb_cad_areaRX;    
+  
+  //Se esta enviando datos  
+  if (gb_play_dtmf === true)
+  {	  
+   cadTX = 'TX:' + (gb_current_dtmf_send+1).toString() + '/' + (gb_total_dtmf_send+1).toString();
+   cadTX +='(' + gb_buf_send_dtmf[gb_current_dtmf_send] + ')';
+   text(cadTX, 560, 420);
+  }
  }
 }
 
@@ -889,8 +915,7 @@ function ProcesSMSTipo0()
  cadAreaRX = cadLog;
  cadLog += ' RX Srv:0';
  cadLog += ' Len:'+auxLen;
- auxLen = (Math.trunc(auxLen/2));
- cadLog += ' Chr:' + auxLen.toString();
+ auxLen = (Math.trunc(auxLen/2)); 
  cont= 1; //Comienza despues servicio
  for (i=0;i<auxLen;i++)
  {
@@ -899,9 +924,9 @@ function ProcesSMSTipo0()
   cont+= 2;
  }
  cadLog += ' DTMF: '+cadDTMF;
- cadLog += ' BASE64: '+cadBase64;
+ cadLog += ' BASE64: '+cadBase64+ ' Len:'+auxLen.toString();
  cadRX = atob(cadBase64); //Base64 decode
- cadLog += ' RX:'+cadRX+' Len:'+cadRX.length;
+ cadLog += ' RX:'+cadRX+' Len:'+cadRX.length.toString();
  
  console.log(cadLog);
  cadAreaRX += ' RX:'+cadRX;
@@ -939,7 +964,7 @@ function PollProcessDTMF()
  if (gb_begin_sync_dtmf === true)
  {
   gb_begin_sync_dtmf= false; //Comienzo trama
-  gb_cadDTMF +=' Sync';
+  //gb_cadDTMF +=' Sync';
   
   //let aux_cad = gb_buf_rcv_dtmf;  
   //console.log(aux_cad);
@@ -959,13 +984,59 @@ function PollProcessDTMF()
   }  
 	 
   gb_event_new_data_dtmf= false;//Nuevo dato
-  gb_cadDTMF +=' Data';
+  //gb_cadDTMF +=' Data';
   
   let aux_cad = gb_buf_rcv_dtmf;  
   gb_cadDTMF+=' '+StringTwoKeyDTMFToString(aux_cad);
   
   gb_forceDraw = true;
  }
+}
+
+//Selecciona tab config gamepad
+function SelectTabPAD()
+{
+ gb_ctrl_btnTabPAD.elt.disabled = true;
+ gb_ctrl_btnTabRX.elt.disabled = false;
+	
+ gb_ctrl_areaRX.hide();
+ gb_ctrl_areaTX.hide();
+ 
+ gb_ctrl_input_stq.show();
+ gb_ctrl_input_q4.show();
+ gb_ctrl_input_q3.show();
+ gb_ctrl_input_q2.show();
+ gb_ctrl_input_q1.show();
+
+ gb_btnLoadBtnPAD.show();
+
+ gb_ctrl_btnPruebaSendSMS0.hide();
+ gb_ctrl_btnPruebaSendTX0.hide();
+ //gb_ctrl_btnPruebaSendDTMF.hide();
+ gb_ctrl_btnPruebaSendSMS1.hide(); 
+}
+
+//Selecciona tab RX
+function SelectTabRX()
+{ 
+ gb_ctrl_btnTabPAD.elt.disabled = false;
+ gb_ctrl_btnTabRX.elt.disabled = true;
+ 
+ gb_ctrl_areaRX.show();
+ gb_ctrl_areaTX.show();
+
+ gb_ctrl_input_stq.hide();
+ gb_ctrl_input_q4.hide();
+ gb_ctrl_input_q3.hide();
+ gb_ctrl_input_q2.hide();
+ gb_ctrl_input_q1.hide();
+ 
+ gb_btnLoadBtnPAD.hide(); 
+ 
+ gb_ctrl_btnPruebaSendSMS0.show();
+ gb_ctrl_btnPruebaSendTX0.show();
+ //gb_ctrl_btnPruebaSendDTMF.show();
+ gb_ctrl_btnPruebaSendSMS1.show();
 }
 
 //Rutina principal Draw Poll
