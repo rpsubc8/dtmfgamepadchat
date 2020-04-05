@@ -35,11 +35,11 @@ En este ejemplo, el mando, se ha optado por los siguientes botones, pero pueden 
 </ul>
 
 
-<br>
+<br><br>
 <a name="html5"><h2>HTML5</h2></a>
 Se ha optado por HTML5 (js) para poder conseguir la máxima portabilidad. El interface actual no es el definitivo, dado que se ha usado algo simple para pruebas de funcionalidad.
 
-<br>
+<br><br>
 <a name="opciones"><h2>Opciones</h2></a>
 <center><img src='preview/captureOptions.gif'></center>
 Si seleccionamos el botón de TabPAD, podremos acceder a todas las opciones:
@@ -56,10 +56,10 @@ Si seleccionamos el botón de TabPAD, podremos acceder a todas las opciones:
  <li>Q2 (botón del PAD para pin Q2 del MT8870)</li>
  <li>Q1 (botón del PAD para pin Q1 del MT8870)</li> 
 </ul>
-Se puede tener al mismo tiempo activo el Gamepad y Micrófono para poder decodificar al mismo tiempo de ambos sitios, pero lo normal es tener sólo uno activo (el que vayamos a usar).
-El PTT equivale a enviar la tono 'D' tantas veces como este especificado. De esta forma, permitirá abrir el VOX de un talkie.
+Se puede tener al mismo tiempo activo el Gamepad y Micrófono para poder decodificar al mismo tiempo de ambos sitios, pero lo normal es tener sólo uno activo (el que vayamos a usar).<br>
+El PTT equivale a enviar la tono 'D' tantas veces como este especificado. De esta forma, permitirá abrir el VOX de un talkie.<br>
 El fullduplex es útil para test, ya que nos permite una especie de ECO, si hacemos un envio para ver en el propio equipo lo que se recibe, pero lo normal es tenerlo desactivado mientras se transmite.
-<br>
+<br><br>
 
 <a name="estado"><h2>Estado del proyecto</h2></a>
 <ul>
