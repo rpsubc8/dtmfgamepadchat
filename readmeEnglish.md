@@ -82,7 +82,7 @@ We must adjust both the output and input levels, so that the tones are well dete
 
 
 <br><br>
-<a name="options"><h2>Options</h2><a>
+<a name="opciones"><h2>Options</h2><a>
 <center><img src='preview/captureOptions.gif'></center>
 If we select the TabPAD button, we can access all the options:
 <ul>
@@ -104,7 +104,7 @@ The fullduplex is useful for testing, since it allows us a kind of ECO, if we ma
 <br><br>
  
  
-<a name="code"><h2>Code</h2><a>
+<a name="codigo"><h2>Code</h2><a>
 If we select the code from the <b>sketch.js</b> we can modify certain variables, which are the options, in order to apply them directly, without having to do it from the application:
 <pre><code>
  //Configurations
@@ -122,7 +122,7 @@ If we select the code from the <b>sketch.js</b> we can modify certain variables,
 </code></pre>
 <br><br>
 
-<a name="status"><h2>Project status</h2><a>
+<a name="estado"><h2>Project status</h2><a>
 <ul>
  <li>Phase 1 - Simple Chat</li>
  <li>Phase 2 - Scaling up of (developing) services</li>
