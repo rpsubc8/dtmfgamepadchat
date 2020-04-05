@@ -9,8 +9,6 @@ Envio de SMS's bajo tonos DTMF, con decodificación en tiempo real usando micró
  <li><a href='#opciones'>Opciones<a/></li>
  <li><a href='#estado'>Estado del proyecto<a/></li>
 </ul>
-
-<br>
 <a name="interface"><h2>Interface</h2></a>
 Se permiten varios interfaces:
 <ul>
