@@ -61,6 +61,16 @@ Se requiere previamente flashear el chip ATMEGA16u2 con:
 <a href='https://github.com/harlequin-tech/arduino-usb'>https://github.com/harlequin-tech/arduino-usb</a>
 
 Se debe usar la herramienta FLIP y poner el chip en modo DFU.
+<br>
+Si queremos otros botones, deberemos modificar el código de ARDUINO:
+<pre><code>
+#define pad_stq 2 //Le restamos 1
+#define pad_q4 4
+#define pad_q3 5
+#define pad_q2 8
+#define pad_q1 9
+</code></pre>
+ 
 
 
 
