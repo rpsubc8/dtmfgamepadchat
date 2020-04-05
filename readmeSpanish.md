@@ -60,8 +60,7 @@ Se requiere previamente flashear el chip ATMEGA16u2 con:
 
 <a href='https://github.com/harlequin-tech/arduino-usb'>https://github.com/harlequin-tech/arduino-usb</a>
 
-Se debe usar la herramienta FLIP y poner el chip en modo DFU.
-<br>
+Se debe usar la herramienta FLIP y poner el chip en modo DFU.<br>
 Si queremos otros botones, deberemos modificar el código de ARDUINO:
 <pre><code>
 #define pad_stq 2 //Le restamos 1
@@ -70,7 +69,7 @@ Si queremos otros botones, deberemos modificar el código de ARDUINO:
 #define pad_q2 8
 #define pad_q1 9
 </code></pre>
- 
+Se ha forzado por código cambios en los EJES para que equivalga a un boton presionado, para que así los navegadores lo detecten en el HTML5, y no haya que pulsar ningún boton, dado que al ser un emulador con ARDUINO, seria dificil de simular.
 
 
 
