@@ -67,20 +67,20 @@ El fullduplex es útil para test, ya que nos permite una especie de ECO, si hace
 
 <a name="codigo"><h2>Código</h2></a>
 Si seleccionamos el código del <b>sketch.js</b> podremos modificar ciertas variables, que son las opciones, para así aplicarlas directamente, sin falta de hacerlas desde la aplicación:
-<ul>
-//Configuraciones
-var gb_cadPTT = 'DDDD';        //Activar PTT VOX numero de tono D a repetir
-var gb_log_debug = true;       //Sacamos log de RX y TX true o false
-var gb_fullduplex = true;      //RX y TX al mismo tiempo true o false
-var gb_use_gamepad_dtmf= true; //Permite lectura de gamepad MT8870 true o false
-var gb_use_mic_dtmf= false;    //Permite lectura de microfono true o false
-var gb_id_stq = 3;             //Boton PAD para pin STQ MT8870
-var gb_id_q4 = 5;              //Boton PAD para pin Q4 MT8870
-var gb_id_q3 = 6;              //Boton PAD para pin Q3 MT8870
-var gb_id_q2 = 9;              //Boton PAD para pin Q2 MT8870
-var gb_id_q1 = 10;             //Boton PAD para pin Q1 MT8870
-var gb_speed_dtmf = 1;         //Velocidad envio tonos 1 .. 9 (Solo MT8870)
-</ul>
+<pre><code>
+ //Configuraciones
+ var gb_cadPTT = 'DDDD';        //Activar PTT VOX numero de tono D a repetir
+ var gb_log_debug = true;       //Sacamos log de RX y TX true o false
+ var gb_fullduplex = true;      //RX y TX al mismo tiempo true o false
+ var gb_use_gamepad_dtmf= true; //Permite lectura de gamepad MT8870 true o false
+ var gb_use_mic_dtmf= false;    //Permite lectura de microfono true o false
+ var gb_id_stq = 3;             //Boton PAD para pin STQ MT8870
+ var gb_id_q4 = 5;              //Boton PAD para pin Q4 MT8870
+ var gb_id_q3 = 6;              //Boton PAD para pin Q3 MT8870
+ var gb_id_q2 = 9;              //Boton PAD para pin Q2 MT8870
+ var gb_id_q1 = 10;             //Boton PAD para pin Q1 MT8870
+ var gb_speed_dtmf = 1;         //Velocidad envio tonos 1 .. 9 (Solo MT8870)
+</code></pre>
 <br><br>
 
 <a name="estado"><h2>Estado del proyecto</h2></a>
