@@ -4,6 +4,7 @@ Envio de SMS's bajo tonos DTMF, con decodificación en tiempo real usando micró
 <br>
 <ul>
  <li><a href='#interface'>Interface<a/></li>
+ <li><a href='#arduino'>ARDUINO HID<a/></li>  
  <li><a href='#html5'>HTML5<a/></li>
  <li><a href='#opciones'>Opciones<a/></li>
  <li><a href='#codigo'>Código</a></li>
@@ -33,6 +34,34 @@ En este ejemplo, el mando, se ha optado por los siguientes botones, pero pueden 
  <li><b>Q2</b> (botón 9)</li>
  <li><b>Q1</b> (botón 10)</li>
 </ul>
+<br><br>
+
+<a name="arduino"><h2>ARDUINO HID</h2></a>
+Si se dispone de una placa Arduino uno R3 ATMEGA328 con el chip de comunicaciones ATMEGA 16u2, se puede hacer uso del código modificado big_joystick_dtmf para poder emular un joystick de 40 botones HID, que se activan por las señales del MT8870 que hemos conectado a los pines:
+<center><img src="preview/arduinoHidJoystick.png"></center>
+<ul>
+ <li>stq - 2</li>
+ <li>q4 - 3</li>
+ <li>q3 - 4</li>
+ <li>q2 - 5</li>
+ <li>q1 - 6</li>
+</ul> 
+
+Los botones del mando son:
+<ul>
+ <li>stq - 3</li>
+ <li>q4 - 5</li>
+ <li>q3 - 6</li>
+ <li>q2 - 9</li>
+ <li>q1 - 10</li>
+</ul>
+
+Se requiere previamente flashear el chip ATMEGA16u2 con:
+
+<a href='https://github.com/harlequin-tech/arduino-usb'>https://github.com/harlequin-tech/arduino-usb</a>
+
+Se debe usar la herramienta FLIP y poner el chip en modo DFU.
+
 
 
 <br><br>
