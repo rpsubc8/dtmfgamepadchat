@@ -56,3 +56,76 @@ The buttons on the remote are:
 </ul>
 
 It is required to flash the ATMEGA16u2 chip with:
+
+<a href='https://github.com/harlequin-tech/arduino-usb'>https://github.com/harlequin-tech/arduino-usb</a>
+
+Use the FLIP tool and put the chip in DFU mode.
+If we want other buttons, we will have to modify the ARDUINO code:
+<pre><code>
+#define pad_stq 2 // subtract 1
+#define pad_q4 4
+#define pad_q3 5
+#define pad_q2 8
+#define pad_q1 9
+</code></pre>
+It has been forced by code changes in the AXES to be equivalent to a button pressed, so that browsers detect it in the HTML5, and no button has to be pressed, since being an emulator with ARDUINO, it would be difficult to simulate.
+
+
+
+<br><br>
+<a name="html5"><h2>HTML5</h2></a>
+HTML5 (js) has been chosen to achieve maximum portability. The current interface is not the definitive one, since something simple has been used for functionality tests.<br>
+In HTML5 there are certain permission problems, both in the use of the microphone, as the GAMEPAD, which are solved differently, depending on browser and device.<br>
+A typical problem with the gamepad is that you have to connect by usb and disconnect every time you have to use it or even that you have to press a button on the gamepad to accept permission on the first initialization.<br>
+For the microphone, you need to give permission to use the microphone input.
+We must adjust both the output and input levels, so that the tones are well detected.
+
+
+<br><br>
+<a name="options"><h2>Options</h2><a>
+<center><img src='preview/captureOptions.gif'></center>
+If we select the TabPAD button, we can access all the options:
+<ul>
+ <li>Gamepad (reads DTMF tones from gamepad)</li>
+ <li>Microphone (reads DTMF tones from microphone or line input)</li>
+ <li>PTT (D-tone number sent to activate VOX)</li>
+ <li>Full Duplex (Allows decoding while sending)</li>
+ <li>Log Debug (Write console log)</li>
+ <li>Speed (DTMF sending speed)</li>
+ <li>STQ (PAD button for MT8870 STQ pin)</li>
+ <li>Q4 (PAD button for MT8870 pin Q4)</li>
+ <li>Q3 (PAD button for MT8870 pin Q3)</li>
+ <li>Q2 (PAD button for MT8870 pin Q2)</li>
+ <li>Q1 (PAD button for MT8870 pin Q1)</li> 
+</ul>
+You can have the Gamepad and Microphone active at the same time to be able to decode both sites at the same time, but the normal thing is to have only one active site (the one we are going to use).<br>
+The PTT is equivalent to sending the 'D' tone as many times as specified. This will allow you to open the VOX of a talkie.
+The fullduplex is useful for testing, since it allows us a kind of ECO, if we make a sending to see in the equipment itself what is being received, but the normal thing is to have it deactivated while transmitting.
+<br><br>
+ 
+ 
+<a name="code"><h2>Code</h2><a>
+If we select the code from the <b>sketch.js</b> we can modify certain variables, which are the options, in order to apply them directly, without having to do it from the application:
+<pre><code>
+ //Configurations
+ var gb_cadPTT = 'DDDD'; //Activate PTT VOX tone number to be repeated
+ var gb_log_debug = true; // Let's get RX and TX log true or false
+ var gb_fullduplex = true; //RX and TX at the same time true or false
+ var gb_use_gamepad_dtmf= true; //Allow MT8870 gamepad to read true or false
+ var gb_use_mic_dtmf= false; //Permits reading of microphone true or false
+ var gb_id_stq = 3; //Boton PAD for pin STQ MT8870
+ var gb_id_q4 = 5; // PAD button for pin Q4 MT8870
+ var gb_id_q3 = 6; // PAD button for pin Q3 MT8870
+ var gb_id_q2 = 9; //Bottom PAD for pin Q2 MT8870
+ var gb_id_q1 = 10; //Bottom PAD for pin Q1 MT8870
+ var gb_speed_dtmf = 1; //Speed sent tones 1 .. 9 (MT8870 only)
+</code></pre>
+<br><br>
+
+<a name="status"><h2>Project status</h2>>a>
+<ul>
+ <li>Phase 1 - Simple Chat</li>
+ <li>Phase 2 - Scaling up of (developing) services</li>
+ <li>Phase 3 - Speed increase (in development)</li>
+ <li>Phase 4 - Links (under development)</li>
+</ul>
