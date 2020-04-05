@@ -38,7 +38,7 @@ En este ejemplo, el mando, se ha optado por los siguientes botones, pero pueden 
 <a name="html5"><h2>HTML5</h2></a>
 Se ha optado por HTML5 (js) para poder conseguir la máxima portabilidad. El interface actual no es el definitivo, dado que se ha usado algo simple para pruebas de funcionalidad.<br>
 En HTML5 existen ciertos problemas de permisos, tanto en el uso del micrófono, como el GAMEPAD, que se solucionan de diferente manera, según navegador y dispositivo.<br>
-Un problema típico en el gamepad, es que se tenga que conectar por usb y desconectar cada vez que se tenga que usar o incluso que se tenga que pulsar un botón del gamepad para aceptar permiso en la primer inicialización.<br>
+Un problema típico en el gamepad, es que se tenga que conectar por usb y desconectar cada vez que se tenga que usar o incluso que se tenga que pulsar un botón del gamepad para aceptar permiso en la primera inicialización.<br>
 Para el micrófono, se necesita darle el permiso de usar la entrada del mismo.<br>
 Debemos ajustar los niveles tanto de salida como de entrada, para que se detecten bien los tonos.
 
