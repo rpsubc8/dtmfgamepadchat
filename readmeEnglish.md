@@ -14,7 +14,7 @@ Sending of SMS's under DTMF tones, with real-time decoding using microphone or g
 <a name="interface"><h2>Interface</h2><a>
 Several interfaces are allowed:
 <ul>
- <li><Microphone or line input</li>
+ <li>Microphone or line input</li>
  <li>Line or speaker output</li>
  <li>Joystick or gamepad modified with MT8870</li>
  <li>Arduino emulating joystick (ARDUINO UNO)</li>
@@ -122,7 +122,7 @@ If we select the code from the <b>sketch.js</b> we can modify certain variables,
 </code></pre>
 <br><br>
 
-<a name="status"><h2>Project status</h2>>a>
+<a name="status"><h2>Project status</h2><a>
 <ul>
  <li>Phase 1 - Simple Chat</li>
  <li>Phase 2 - Scaling up of (developing) services</li>
