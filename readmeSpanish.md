@@ -12,7 +12,7 @@ Envio de SMS's bajo tonos DTMF, con decodificación en tiempo real usando micró
 
 <br>
 <a name="interface"><h2>Interface</h2></a>
-Se permiten varios interfaces
+Se permiten varios interfaces:
 <ul>
  <li>Micrófono o entrada de linea</li>
  <li>Salida de linea o altavoces</li>
@@ -41,10 +41,26 @@ Se ha optado por HTML5 (js) para poder conseguir la máxima portabilidad. El int
 
 <br>
 <a name="opciones"><h2>Opciones</h2></a>
-
-
-
+<center><img src='preview/captureOptions.gif'></center>
+Si seleccionamos el botón de TabPAD, podremos acceder a todas las opciones:
+<ul>
+ <li>Gamepad (lee tonos DTMF desde gamepad)</li>
+ <li>Micrófono (lee tonos DTMF desde micrófono o entrada de linea)</li>
+ <li>PTT (Número de tono D que se envia para activar VOX)</li>
+ <li>Fullduplex (Permite decodificar al mismo tiempo que envia)</li>
+ <li>Log Debug (saca un log por consola)</li>
+ <li>Vel (Velocidad de envio DTMF)</li>
+ <li>STQ (botón del PAD para pin STQ del MT8870)</li>
+ <li>Q4 (botón del PAD para pin Q4 del MT8870)</li>
+ <li>Q3 (botón del PAD para pin Q3 del MT8870)</li>
+ <li>Q2 (botón del PAD para pin Q2 del MT8870)</li>
+ <li>Q1 (botón del PAD para pin Q1 del MT8870)</li> 
+</ul>
+Se puede tener al mismo tiempo activo el Gamepad y Micrófono para poder decodificar al mismo tiempo de ambos sitios, pero lo normal es tener sólo uno activo (el que vayamos a usar).
+El PTT equivale a enviar la tono 'D' tantas veces como este especificado. De esta forma, permitirá abrir el VOX de un talkie.
+El fullduplex es útil para test, ya que nos permite una especie de ECO, si hacemos un envio para ver en el propio equipo lo que se recibe, pero lo normal es tenerlo desactivado mientras se transmite.
 <br>
+
 <a name="estado"><h2>Estado del proyecto</h2></a>
 <ul>
  <li>Fase 1 - Simple Chat</li>
