@@ -18,7 +18,7 @@ Se permiten varios interfaces:
  <li>Micrófono o entrada de linea</li>
  <li>Salida de linea o altavoces</li>
  <li>Joystick o gamepad modificado con MT8870</li>
- <li>Arduino emulando joystick (en desarrollo)</li>
+ <li>Arduino emulando joystick (ARDUINO UNO)</li>
 </ul>
 Aunque el uso del MT8870 implica un poco más de dificultad, se consigue mucha más velocidad y precisión a la hora de decodificar tonos DTMF.
 Gracias al chip MT8870, conectando las salidas de STQ, Q4, Q3, Q2 y Q1 a un transistor permitiendo abrir o cerrar
