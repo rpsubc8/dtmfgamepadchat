@@ -12,14 +12,36 @@ Envio de SMS's bajo tonos DTMF, con decodificación en tiempo real usando micró
 
 <br>
 <a name="interface"><h2>Interface</h2></a>
+Se permiten varios interfaces
+<ul>
+ <li>Micrófono o entrada de linea</li>
+ <li>Salida de linea o altavoces</li>
+ <li>Joystick o gamepad modificado con MT8870</li>
+ <li>Arduino emulando joystick (en desarrollo)</li>
+</ul>
+Aunque el uso del MT8870 implica un poco más de dificultad, se consigue mucha más velocidad y precisión a la hora de decodificar tonos DTMF.
+Gracias al chip MT8870, conectando las salidas de STQ, Q4, Q3, Q2 y Q1 a un transistor permitiendo abrir o cerrar
+los botones de un GAMEPAD, se puede decodificar tonos DTMF. Tan sólo necesitamos 5 pines (botones de mando).
+<center><img src='preview/interfacePAD.jpg'></center>
+Tendremos que localizar con multímetro los 5V de alimentación del USB del mando, para poder alimentar el MT8870, así como la masa en común.
+<center><img src='preview/interfaceMT8870.gif'></center>
+En este ejemplo, el mando, se ha optado por los siguientes botones, pero pueden variar, y tendremos que tenerlo en cuenta en la aplicación:
+<ul>
+ <li><b>STQ</b> (botón 3)</li>
+ <li><b>Q4</b> (botón 5)</li>
+ <li><b>Q3</b> (botón 6)</li>
+ <li><b>Q2</b> (botón 9)</li>
+ <li><b>Q1</b> (botón 10)</li>
+</ul>
 
 
 <br>
 <a name="html5"><h2>HTML5</h2></a>
-
+Se ha optado por HTML5 (js) para poder conseguir la máxima portabilidad. El interface actual no es el definitivo, dado que se ha usado algo simple para pruebas de funcionalidad.
 
 <br>
 <a name="opciones"><h2>Opciones</h2></a>
+
 
 
 <br>
