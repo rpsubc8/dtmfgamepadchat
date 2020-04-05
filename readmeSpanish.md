@@ -1,14 +1,15 @@
 # CHAT DTMF
 Envio de SMS's bajo tonos DTMF, con decodificación en tiempo real usando micrófono o gamepad (MT8870 conectado a joystick), bajo HTML5.
 <center><img src='preview/previewChatTabRX.gif'></center>
-<br><br>
-
+<br>
 <ul>
  <li><a href='#interface'>Interface<a/></li>
  <li><a href='#html5'>HTML5<a/></li>
  <li><a href='#opciones'>Opciones<a/></li>
  <li><a href='#estado'>Estado del proyecto<a/></li>
 </ul>
+<br><br>
+
 <a name="interface"><h2>Interface</h2></a>
 Se permiten varios interfaces:
 <ul>
