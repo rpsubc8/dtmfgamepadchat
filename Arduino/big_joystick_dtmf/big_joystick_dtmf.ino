@@ -4,6 +4,7 @@
 // Mod Jaime Jose Gavin Sierra
 // EA1HLX
 // DTMF MT8870 pin to gamepad buttons
+// Arduino Uno R3 ATMEGA328 with ATMEGA 16u2 burn flip firmware big joystick
 
 
 #define pin_dtmf_stq 2
