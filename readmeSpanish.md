@@ -72,7 +72,7 @@ Si queremos otros botones, deberemos modificar el código de ARDUINO:
 #define pad_q1 9
 #define pad_switchFlip 10 //boton flipflop pulsado para activar navegador
 </code></pre>
-Se ha forzado por código cambios en los EJES para que equivalga a un boton presionado, para que así los navegadores lo detecten en el HTML5, y no haya que pulsar ningún boton, dado que al ser un emulador con ARDUINO, seria dificil de simular.
+Se ha forzado por código cambios flip flop del botón 10 para que equivalga a un boton presionado, para que así los navegadores lo detecten en el HTML5, y no haya que pulsar ningún boton, dado que al ser un emulador con ARDUINO, seria dificil de simular.
 <br><br>
 
 <a name="leonardo"><h2>LEONARDO HID</h2></a>
