@@ -77,7 +77,7 @@ Se ha forzado por código cambios en los EJES para que equivalga a un boton pres
 
 <a name="leonardo"><h2>LEONARDO HID</h2></a>
 Si se dispone de una placa Leonardo, siguiendo mismo esquema de botones, y filosofia del Arduino UNO, pero con el código del Leonardo, se puede también emular un joystick.
-Se ha usado las librerías:
+Se ha usado las librerías:<br>
 <a href="https://github.com/MHeironimus/ArduinoJoystickLibrary">https://github.com/MHeironimus/ArduinoJoystickLibrary</a>
 
 
