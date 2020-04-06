@@ -4,8 +4,8 @@ Sending of SMS's under DTMF tones, with real-time decoding using microphone or g
 <br>
 <ul>
  <li><a href="#interface">Interface<a/></li>
- <li><Href="#arduino">ARDUINO UNO HID<a/></li>  
- <li><Href="#leonardo">LEONARDO HID<a/></li>  
+ <li><a href="#arduino">ARDUINO UNO HID<a/></li>  
+ <li><a href="#leonardo">LEONARDO HID<a/></li>  
  <li><a href="#opciones">Options<a/></li>
  <li><a href="#codigo">Code</a></li>
  <li><a href="#estado">Project status<a/></li>
