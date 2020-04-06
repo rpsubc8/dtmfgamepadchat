@@ -23,8 +23,11 @@
 #define pad_q3 5
 #define pad_q2 8
 #define pad_q1 9
+#define pad_switchFlip 10 //boton flipflop pulsado para activar navegador
 
 byte stq,q4,q3,q2,q1;
+bool switchFlip = false;
+byte cont_switchFlip=0;
 
 #undef DEBUG
 
@@ -131,19 +134,29 @@ void loop()
 
     // Move all of the axes
     //Fuerzo a mover para que oblique a pulsar y asi lo detecta el navegador en HTML5
-    for (uint8_t ind=0; ind<8; ind++) 
+    //for (uint8_t ind=0; ind<8; ind++) 
+    //{
+    //	joyReport.axis[ind]++;
+    //  if (joyReport.axis[ind] > 200)
+    //   joyReport.axis[ind] = 0;        
+    //}
+
+    //setButton(&joyReport, pad_stq);
+    //setButton(&joyReport, pad_q4);
+    //setButton(&joyReport, pad_q3);
+    //setButton(&joyReport, pad_q2);
+    //setButton(&joyReport, pad_q1);
+
+    cont_switchFlip ++;
+    if (cont_switchFlip % 10 == 0)
     {
-    	joyReport.axis[ind]++;
-      if (joyReport.axis[ind] > 200)
-       joyReport.axis[ind] = 0;        
+     cont_switchFlip = 0;
+     switchFlip = !switchFlip;
     }
-
-    setButton(&joyReport, pad_stq);
-    setButton(&joyReport, pad_q4);
-    setButton(&joyReport, pad_q3);
-    setButton(&joyReport, pad_q2);
-    setButton(&joyReport, pad_q1);
-
+    if (switchFlip == true)  
+     setButton(&joyReport, pad_switchFlip);
+    else 
+     clearButton(&joyReport, pad_switchFlip);
 
     q4 = digitalRead(pin_dtmf_q4);
     if (q4 == HIGH)
