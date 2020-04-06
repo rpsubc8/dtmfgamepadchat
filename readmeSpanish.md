@@ -4,7 +4,8 @@ Envio de SMS's bajo tonos DTMF, con decodificación en tiempo real usando micró
 <br>
 <ul>
  <li><a href='#interface'>Interface<a/></li>
- <li><a href='#arduino'>ARDUINO HID<a/></li>  
+ <li><a href='#arduino'>ARDUINO UNO HID<a/></li>  
+ <li><a href='#leonardo'>ARDUINO LEONARDO HID<a/></li>  
  <li><a href='#html5'>HTML5<a/></li>
  <li><a href='#opciones'>Opciones<a/></li>
  <li><a href='#codigo'>Código</a></li>
@@ -36,7 +37,7 @@ En este ejemplo, el mando, se ha optado por los siguientes botones, pero pueden 
 </ul>
 <br><br>
 
-<a name="arduino"><h2>ARDUINO HID</h2></a>
+<a name="arduino"><h2>ARDUINO UNO HID</h2></a>
 Si se dispone de una placa Arduino uno R3 ATMEGA328 con el chip de comunicaciones ATMEGA 16u2, se puede hacer uso del código modificado big_joystick_dtmf para poder emular un joystick de 40 botones HID, que se activan por las señales del MT8870 que hemos conectado a los pines:
 <center><img src="preview/arduinoHidJoystick.png"></center>
 <ul>
@@ -54,6 +55,7 @@ Los botones del mando son:
  <li>q3 - 6</li>
  <li>q2 - 9</li>
  <li>q1 - 10</li>
+ <li>Flip flop - 11 (botón oscilante para no tener que apretar un botón desde el navegador)</li>
 </ul>
 
 Se requiere previamente flashear el chip ATMEGA16u2 con:
@@ -68,9 +70,15 @@ Si queremos otros botones, deberemos modificar el código de ARDUINO:
 #define pad_q3 5
 #define pad_q2 8
 #define pad_q1 9
+#define pad_switchFlip 10 //boton flipflop pulsado para activar navegador
 </code></pre>
 Se ha forzado por código cambios en los EJES para que equivalga a un boton presionado, para que así los navegadores lo detecten en el HTML5, y no haya que pulsar ningún boton, dado que al ser un emulador con ARDUINO, seria dificil de simular.
+<br><br>
 
+<a name="leonardo"><h2>LEONARDO HID</h2></a>
+Si se dispone de una placa Leonardo, siguiendo mismo esquema de botones, y filosofia del Arduino UNO, pero con el código del Leonardo, se puede también emular un joystick.
+Se ha usado las librerías:
+<a href="https://github.com/MHeironimus/ArduinoJoystickLibrary">https://github.com/MHeironimus/ArduinoJoystickLibrary</a>
 
 
 <br><br>
