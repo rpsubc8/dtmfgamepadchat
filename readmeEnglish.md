@@ -4,7 +4,8 @@ Sending of SMS's under DTMF tones, with real-time decoding using microphone or g
 <br>
 <ul>
  <li><a href="#interface">Interface<a/></li>
- <li><Href="#arduino">ARDUINO HID<a/></li>  
+ <li><Href="#arduino">ARDUINO UNO HID<a/></li>  
+ <li><Href="#leonardo">LEONARDO HID<a/></li>  
  <li><a href="#opciones">Options<a/></li>
  <li><a href="#codigo">Code</a></li>
  <li><a href="#estado">Project status<a/></li>
@@ -35,7 +36,7 @@ In this example, the control, we have chosen the following buttons, but they can
 </ul>
 <br><br>
  
-<a name="arduino"><h2>ARDUINO HID</h2></a>
+<a name="arduino"><h2>ARDUINO UNO HID</h2></a>
 If you have an Arduino one R3 ATMEGA328 board with the ATMEGA 16u2 communications chip, you can use the modified big_joystick_dtmf code to emulate a 40 button HID joystick, which is activated by the MT8870 signals we have connected to the pins:
 <center><img src="preview/arduinoHidJoystick.png"></center>
 <ul>
@@ -53,6 +54,7 @@ The buttons on the remote are:
  <li>q3 - 6</li>
  <li>q2 - 9</li>
  <li>q1 - 10</li>
+ <li>Flip flop - 11 (rocker button so you don't have to press a button from the browser)</li>
 </ul>
 
 It is required to flash the ATMEGA16u2 chip with:
@@ -67,10 +69,14 @@ If we want other buttons, we will have to modify the ARDUINO code:
 #define pad_q3 5
 #define pad_q2 8
 #define pad_q1 9
+#define pad_switchFlip 10 //flipflop button pressed to activate browser
 </code></pre>
-It has been forced by code changes in the AXES to be equivalent to a button pressed, so that browsers detect it in the HTML5, and no button has to be pressed, since being an emulator with ARDUINO, it would be difficult to simulate.
+It has been forced by code to change the flip flop of the button 10 to make it equivalent to a button pressed, so that the browsers detect it in the HTML5, and there is no need to press any button, since being an emulator with ARDUINO, it would be difficult to simulate. 
+<br><br>
 
-
+<a name="leonardo"><h2>LEONARDO HID</h2></a>
+If you have a Leonardo board, following the same button scheme and philosophy as the Arduino UNO, but with the Leonardo code, you can also emulate a joystick. The libraries have been used:<br>
+<a href="https://github.com/MHeironimus/ArduinoJoystickLibrary">https://github.com/MHeironimus/ArduinoJoystickLibrary</a>
 
 <br><br>
 <a name="html5"><h2>HTML5</h2></a>
