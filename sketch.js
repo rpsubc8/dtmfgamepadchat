@@ -14,14 +14,15 @@ const const_max_length_sms = 64; //128 caracters maximos para un sms
 var gb_cadPTT = 'DDDD';        //Activar PTT VOX numero de tono D a repetir
 var gb_log_debug = true;       //Sacamos log de RX y TX true o false
 var gb_fullduplex = true;      //RX y TX al mismo tiempo true o false
-var gb_use_gamepad_dtmf= true; //Permite lectura de gamepad MT8870 true o false
-var gb_use_mic_dtmf= false;    //Permite lectura de microfono true o false
+var gb_use_gamepad_dtmf= false //Permite lectura de gamepad MT8870 true o false
+var gb_use_mic_dtmf= true;     //Permite lectura de microfono true o false
 var gb_id_stq = 3;             //Boton PAD para pin STQ MT8870
 var gb_id_q4 = 5;              //Boton PAD para pin Q4 MT8870
 var gb_id_q3 = 6;              //Boton PAD para pin Q3 MT8870
 var gb_id_q2 = 9;              //Boton PAD para pin Q2 MT8870
 var gb_id_q1 = 10;             //Boton PAD para pin Q1 MT8870
 var gb_speed_dtmf = 1;         //Velocidad envio tonos 1 .. 9 (Solo MT8870)
+var gb_use_sms = 1;            //Usar compresion SMS 0,1
 
 
 
@@ -45,7 +46,7 @@ var gb_ctrl_btnTabPAD;
 var gb_ctrl_btnTabRX;
 
 //var gb_ctrl_btnPruebaSendDTMF;
-var gb_ctrl_btnPruebaSendSMS0;
+//var gb_ctrl_btnPruebaSendSMS0;
 var gb_ctrl_btnPruebaSendTX0;
 var gb_ctrl_btnPruebaSendSMS1;
 
@@ -68,6 +69,7 @@ var gb_ctrl_chkbox_fullduplex; //fullduplex
 var gb_ctrl_chkbox_log; //Logger
 var gb_ctrl_lbl_speed_dtmf; //Speed
 var gb_ctrl_input_speed_dtmf; //Speed
+var gb_ctrl_cmbSMS; //Combobox
 
 var gb_cad_botones='';
 
@@ -148,11 +150,6 @@ function setup() {
   //gb_ctrl_btnPruebaSendDTMF.position(220, 290);
   //gb_ctrl_btnPruebaSendDTMF.mousePressed(PruebaSendDTMF);
   
-  gb_ctrl_btnPruebaSendSMS0 = createButton('SendSMS0');
-  x = Math.trunc(resWidth/1.4);
-  y = Math.trunc(resHeight/2.1);  
-  gb_ctrl_btnPruebaSendSMS0.position(x, y);
-  gb_ctrl_btnPruebaSendSMS0.mousePressed(function(){SendSMSTipo0('HOLA')});
     
   gb_ctrl_areaTX = createElement('textarea');
   y = Math.trunc(resHeight/2.1) + y_ini;
@@ -163,17 +160,42 @@ function setup() {
   gb_ctrl_areaTX.elt.maxLength = const_max_length_sms;
   gb_ctrl_areaTX.elt.placeholder='';
   
-  gb_ctrl_btnPruebaSendTX0 = createButton('Send TX0');
+  gb_ctrl_btnPruebaSendTX0 = createButton('Send TX');
   x = Math.trunc(resWidth/1.75);
   y = Math.trunc(resHeight/2.05);
   gb_ctrl_btnPruebaSendTX0.position(x, y);
-  gb_ctrl_btnPruebaSendTX0.mousePressed(PruebaSendTXSMSTipo0);	
+  gb_ctrl_btnPruebaSendTX0.mousePressed(function(){SendTXSMSTipo(gb_use_sms)});	
+
+
+  //gb_ctrl_btnPruebaSendSMS0 = createButton('SendSMS0');
+  //x = Math.trunc(resWidth/1.4);
+  //y = Math.trunc(resHeight/2.1);  
+  //gb_ctrl_btnPruebaSendSMS0.position(x, y);
+  //gb_ctrl_btnPruebaSendSMS0.mousePressed(function(){SendSMSTipo0('HOLA')});
   
-  gb_ctrl_btnPruebaSendSMS1 = createButton('SendSMS1');
+  
+  gb_ctrl_cmbSMS = createSelect();
   x = Math.trunc(resWidth/1.4);
-  y = Math.trunc(resHeight/1.9);
-  gb_ctrl_btnPruebaSendSMS1.position(x, y);
-  gb_ctrl_btnPruebaSendSMS1.mousePressed(PruebaSendSMSTipo1);
+  y = Math.trunc(resHeight/2.1);  
+  gb_ctrl_cmbSMS.position(x, y);
+  gb_ctrl_cmbSMS.option('0');
+  gb_ctrl_cmbSMS.option('1');
+  switch (gb_use_sms)
+  {
+   case 0: gb_ctrl_cmbSMS.selected('0');
+    break;
+   case 1: gb_ctrl_cmbSMS.selected('1');
+    break;
+   default: gb_ctrl_cmbSMS.selected('0');
+    break;
+  }
+  gb_ctrl_cmbSMS.changed(UseSMSEvent);  
+  
+  //gb_ctrl_btnPruebaSendSMS1 = createButton('SendSMS1');
+  //x = Math.trunc(resWidth/1.4);
+  //y = Math.trunc(resHeight/1.9);
+  //gb_ctrl_btnPruebaSendSMS1.position(x, y);
+  //gb_ctrl_btnPruebaSendSMS1.mousePressed(function(){SendSMSTipo1('HOLA QUE TAL')});
   
 
   gb_ctrl_lbl_stq = createElement('h4', 'STQ'); //label
@@ -271,9 +293,8 @@ function setup() {
   gb_ctrl_input_speed_dtmf.elt.min = 1;
   gb_ctrl_input_speed_dtmf.elt.max = 9;    
   gb_ctrl_input_speed_dtmf.input(SpeedEvent);
-  gb_ctrl_input_speed_dtmf.elt.value = gb_speed_dtmf.toString();
-  
-  
+  gb_ctrl_input_speed_dtmf.elt.value = gb_speed_dtmf.toString();  
+  SpeedEvent(); //Fuerza la velocidad leida
 
   SelectTabRX(); //Seleccion Recepcion
 	  
@@ -283,6 +304,20 @@ function setup() {
  {  
   DebugLog(err.message.toString());
  }
+}
+
+//Usar compresion SMS
+function UseSMSEvent()
+{
+ try
+ {
+  gb_use_sms = Number(this.elt.value);
+  //alert (gb_use_sms);
+ }
+ catch(err)
+ {  
+  DebugLog(err.message.toString());
+ } 
 }
 
 //Velocidad envio tonos
@@ -427,10 +462,16 @@ function LogDebugEvent()
 //Imprime consola log si tenemos activa gb_log_debug
 function DebugLog(cad)
 {
- if (gb_log_debug === true)
+ try
  {
-  console.log(cad);
+  if (gb_log_debug === true)
+  {
+   console.log(cad);
+  }
  }
+ catch(err)
+ {  
+ } 
 }
 
 //Numero de D para activar VOX PTT
@@ -666,12 +707,20 @@ function DTMFtoCharBase64(dtmf)
 }
 
 //Envia un mensaje del TextMemo
-function PruebaSendTXSMSTipo0()
+function SendTXSMSTipo(tipo)
 {
  try
  { 
   let cadToSend = gb_ctrl_areaTX.elt.value;
-  SendSMSTipo0(cadToSend);
+  switch (tipo)
+  {
+   case 0: SendSMSTipo0(cadToSend);
+    break;
+   case 1: SendSMSTipo1(cadToSend);
+    break;	
+   default: SendSMSTipo0(cadToSend);
+    break;	
+  }
  }
  catch(err)
  {
@@ -702,7 +751,7 @@ function SendSMSTipo0(cadToSend)
   gb_buf_send_dtmf = gb_cadPTT + '#';
   //gb_buf_send_dtmf = '#';
   let cadLog = '';
-  let frameData = '0'; //Servicio 0
+  let frameData = '0'; //Tipo 0
   let cadTX = '';
   //let cadSend = '323334'; 
   //let cadToSend = 'HOLA';
@@ -710,7 +759,7 @@ function SendSMSTipo0(cadToSend)
   let encodedString = btoa(cadToSend); //Base64  
   cadLog += new Date(Date.now()).toLocaleString('en-GB').replace(',','');
   cadTX = cadLog;
-  cadLog += ' TX '+cadToSend+' Len:'+cadToSend.length.toString();
+  cadLog += ' TX Type:0 '+cadToSend+' Len:'+cadToSend.length.toString();
   cadLog += ' BASE64:'+encodedString+ ' Len:'+encodedString.length.toString();
   let cadDTMF = '';
   let i=0;
@@ -719,9 +768,9 @@ function SendSMSTipo0(cadToSend)
    cadDTMF += CharBase64To2DTMF(encodedString[i]);
   }
   cadLog += ' DTMF:' + cadDTMF+' Len:'+cadDTMF.length.toString();  
-  DebugLog(cadLog);
+  //DebugLog(cadLog);
  
-  cadTX+=' TX:'+cadToSend;
+  cadTX+=' TX(0):'+cadToSend;
   UpdateAreaRX(cadTX);
  
   frameData += cadDTMF;
@@ -731,6 +780,9 @@ function SendSMSTipo0(cadToSend)
   }
   //gb_buf_send_dtmf[(frameData.length+1)]='*';
   gb_buf_send_dtmf += '*';
+  
+  cadLog += ' Frame:'+gb_buf_send_dtmf+' Len:'+gb_buf_send_dtmf.length.toString();
+  DebugLog(cadLog);
  
   //gb_total_dtmf_send= frameData.length+1;
   gb_total_dtmf_send = gb_buf_send_dtmf.length;
@@ -747,26 +799,88 @@ function SendSMSTipo0(cadToSend)
  } 
 }
 
-//Send SMS de Prueba basica tipo 1 cin longitud y CRC
-function PruebaSendSMSTipo1()
+//Genera CRC de todo el frame a enviar
+function FrameGenerateCRC(frameOrigen)
 {
- //gb_buf_send_dtmf[0]='#';
+ let aReturn = '00';
+ let aux = 0;
  try
  {
-  gb_buf_send_dtmf = '#';
-  let cadSend = '0'; //Servicio 0
-  cadSend += '16';   //Longitud cadena
-  cadSend += '00';   //CRC
-  cadSend += '323334';
-  let i=0;
-  for (i=1;i<=cadSend.length;i++){
-   //gb_buf_send_dtmf[i] = cadSend[(i-1)];
-   gb_buf_send_dtmf += cadSend[(i-1)];
+  let i = 0;
+  for (i=0; i<frameOrigen.length; i++)
+  {
+   aux += Number(frameOrigen[i]);   
   }
-  //gb_buf_send_dtmf[(cadSend.length+1)]='*'; 
-  gb_buf_send_dtmf += '*'; 
+  if (aux > 63)
+  {
+   aux = aux % 64;
+  }
+  aReturn = aux.toString().padStart(2,'0');
+ }
+ catch(err)
+ {
+  DebugLog(err.message.toString());
+ } 
+ return aReturn;
+}
+
+//Send SMS de Prueba basica tipo 1 cin longitud y CRC
+function SendSMSTipo1(cadToSend)
+{
+ //#10CRxxYYzz*
+ //Tipo:1  
+ //Servicio:0 Diccionario Espaniol
+ //Longitud 00
+ //CRC 00
+ try
+ {  
+  gb_buf_send_dtmf = gb_cadPTT + '#';
+  let cadLog = '';
+  let frameData = '1'; //Tipo 1
+  let cadLen = '00'; //Longitud
+  let cadCRC = '00';   //CRC
+  let cadTX = '';
+  let cadServ = '0'; //Servicio 0 //Diccionario Espaniol
+  let cadCompress = '';
+  let cadDTMF = '';
+  let encodedString = '';  
+  
+  cadLog += new Date(Date.now()).toLocaleString('en-GB').replace(',','');
+  cadTX = cadLog;
+  cadCompress = TextoComprimeDiccionario(cadToSend);  
+  encodedString = btoa(cadCompress); //Base64  
+  
+    
+  
+  cadLen = cadToSend.length.toString().padStart(2, '0');
+  let i=0;
+  for (i=0;i<encodedString.length;i++)
+  {	 
+   cadDTMF += CharBase64To2DTMF(encodedString[i]);
+  }  
+  cadCRC = FrameGenerateCRC(cadDTMF);
+  frameData += cadServ + cadLen + cadCRC;
+    
+  frameData += cadDTMF;
+  for (i=0;i<frameData.length;i++){   
+   gb_buf_send_dtmf += frameData[i];
+  }  
+  gb_buf_send_dtmf += '*';
+
+  cadTX+=' TX(1):' + cadToSend;
+  UpdateAreaRX(cadTX);
+  
+  cadLog += ' TX Type:1 Serv:0 Len:'+ cadLen +' CRC:'+cadCRC;
+  cadLog += ' '+cadToSend+' Len:'+cadToSend.length.toString();
+  cadLog += ' Compress:'+cadCompress + ' Len:'+cadCompress.length.toString();
+  cadLog += ' BASE64:'+encodedString+ ' Len:'+encodedString.length.toString();  
+  cadLog += ' DTMF:' + cadDTMF+' Len:'+cadDTMF.length.toString();    
+  cadLog += ' Frame:'+gb_buf_send_dtmf+' Len:'+gb_buf_send_dtmf.length.toString();
+    
+  
+  DebugLog(cadLog);
  
-  gb_total_dtmf_send= cadSend.length;
+  gb_total_dtmf_send = gb_buf_send_dtmf.length;
   gb_current_dtmf_send = 0;
   gb_play_dtmf= true;
   gb_begin_dtmf = false;
@@ -1396,26 +1510,27 @@ function ProcesSMSTipo0()
  
  try
  {
-  auxLen = gb_buf_rcv_dtmf.length-2; //Quitamos * y Srv 0  
+  auxLen = gb_buf_rcv_dtmf.length-2; //Quitamos * y Type 0  
   cadLog += new Date(Date.now()).toLocaleString('en-GB').replace(',','');
   cadAreaRX = cadLog;
-  cadLog += ' RX Srv:0';
+  cadLog += ' RX Type:0';
   cadLog += ' Len:'+auxLen;
-  auxLen = (Math.trunc(auxLen/2)); 
+  auxLen = (Math.trunc(auxLen/2));
   cont= 1; //Comienza despues servicio
   for (i=0;i<auxLen;i++)
   {
    cadDTMF += gb_buf_rcv_dtmf[cont] + gb_buf_rcv_dtmf[cont+1];
    cadBase64 += DTMFtoCharBase64(gb_buf_rcv_dtmf[cont] + gb_buf_rcv_dtmf[cont+1]);
-   cont+= 2;
+   cont += 2;
   }
-  cadLog += ' DTMF: '+cadDTMF;
-  cadLog += ' BASE64: '+cadBase64+ ' Len:'+auxLen.toString();
+  cadLog += ' DTMF:' + cadDTMF;
+  cadLog += ' BASE64:' + cadBase64+ ' Len:' + auxLen.toString();
   cadRX = atob(cadBase64); //Base64 decode
-  cadLog += ' RX:'+cadRX+' Len:'+cadRX.length.toString();
+  cadLog += ' RX:' + cadRX + ' Len:' + cadRX.length.toString();
+  cadLog += ' Frame:#' + gb_buf_rcv_dtmf + ' Len:' + (gb_buf_rcv_dtmf.length + 1).toString(); //Aniadido #
    
   DebugLog(cadLog);
-  cadAreaRX += ' RX:'+cadRX;
+  cadAreaRX += ' RX(0):'+cadRX;
   UpdateAreaRX(cadAreaRX);
   gb_buf_rcv_dtmf = '';
  }
@@ -1428,27 +1543,52 @@ function ProcesSMSTipo0()
 //Procesa un SMS Tipo 1 con longitud y CRC
 function ProcesSMSTipo1()
 {
- let auxLen= 0;
+ let auxLen= 0; //longiud trama
+ let auxCadLen=0; //longitud cadena
  let auxCRC= 0;
+ let cadServ= 0;
  let cadLog='';
+ let i=0;
+ let cont=0;
+ let cadBase64='';
+ let cadDTMF ='';
+ let cadDecompress='';
+ let cadAreaRX ='';
  try
  {
-  if (gb_end_sms === true)
+  auxLen = gb_buf_rcv_dtmf.length-7; //Quitamos *(1),Type 0(1),Serv(1),Len(2),CRC(2)
+  auxLen = (Math.trunc(auxLen/2));
+  cadServ = gb_buf_rcv_dtmf[1]; //Servicio
+  auxCadLen = parseInt(gb_buf_rcv_dtmf[2]+gb_buf_rcv_dtmf[3]); //Longitud 2 caracteres
+  auxCRC = parseInt(gb_buf_rcv_dtmf[4]+gb_buf_rcv_dtmf[5]); //CRC  
+  //alert (auxLen);   
+  cadLog += new Date(Date.now()).toLocaleString('en-GB').replace(',','');
+  cadAreaRX = cadLog;
+  
+  cadLog += 'RX Type:1';
+  cadLog += ' Srv: '+cadServ; //Servicio
+  cadLog += ' Long '+auxCadLen.toString(); //Longitud
+  cadLog += ' CRC '+auxCRC.toString(); //CRC
+  cont= 6; //Comienza despues de CRC
+  for (i=0; i<auxLen; i++)
   {
-   gb_end_sms = false;  
-   //alert(gb_buf_rcv_dtmf);
-   if (gb_buf_rcv_dtmf[0] === '1') //Servicio 1 SMS
-   {
-    auxLen = parseInt(gb_buf_rcv_dtmf[1]+gb_buf_rcv_dtmf[2]); //Longitud 2 caracteres
-    auxCRC = parseInt(gb_buf_rcv_dtmf[3]+gb_buf_rcv_dtmf[4]); //CRC
-    //alert (auxLen);   
-    cadLog += 'RX Serv 1';
-    cadLog += ' Long '+auxLen;
-    cadLog += ' CRC '+auxCRC;    
-	DebugLog(cadLog);
-    //gb_buf_rcv_dtmf = '';
-   }
+   cadDTMF += gb_buf_rcv_dtmf[cont] + gb_buf_rcv_dtmf[cont+1];
+   cadBase64 += DTMFtoCharBase64(gb_buf_rcv_dtmf[cont] + gb_buf_rcv_dtmf[cont+1]);
+   cont += 2;
   }
+  cadLog += ' DTMF:'+cadDTMF;
+  cadLog += ' BASE64:'+cadBase64+ ' Len:'+auxLen.toString();
+  cadRX = atob(cadBase64); //Base64 decode
+  cadLog += ' RX:' + cadRX + ' Len:' + cadRX.length.toString();
+  cadDecompress = TextoDescomprimeDiccionario(cadRX);
+  cadLog += ' Decompress:' + cadDecompress + ' Len:'+cadDecompress.length.toString();
+  cadLog += ' Frame:#' + gb_buf_rcv_dtmf + ' Len:' + (gb_buf_rcv_dtmf.length + 1).toString(); //Aniadido #
+  
+  DebugLog(cadLog);
+  
+  cadAreaRX += ' RX(1):' + cadDecompress;
+  UpdateAreaRX(cadAreaRX);
+  gb_buf_rcv_dtmf = '';
  }
  catch(err)
  {
@@ -1520,10 +1660,11 @@ function SelectTabPAD()
   gb_ctrl_input_q2.show();
   gb_ctrl_input_q1.show();
 
-  gb_ctrl_btnPruebaSendSMS0.hide();
+  //gb_ctrl_btnPruebaSendSMS0.hide();
   gb_ctrl_btnPruebaSendTX0.hide();
   //gb_ctrl_btnPruebaSendDTMF.hide();
-  gb_ctrl_btnPruebaSendSMS1.hide(); 
+  //gb_ctrl_btnPruebaSendSMS1.hide();
+  gb_ctrl_cmbSMS.hide();
     
   gb_ctrl_chkboxPAD.show();
   gb_ctrl_chkboxMic.show();
@@ -1565,10 +1706,11 @@ function SelectTabRX()
   gb_ctrl_input_q2.hide();
   gb_ctrl_input_q1.hide();
  
-  gb_ctrl_btnPruebaSendSMS0.show();
+  //gb_ctrl_btnPruebaSendSMS0.show();
   gb_ctrl_btnPruebaSendTX0.show();
   //gb_ctrl_btnPruebaSendDTMF.show();
-  gb_ctrl_btnPruebaSendSMS1.show();
+  //gb_ctrl_btnPruebaSendSMS1.show();
+  gb_ctrl_cmbSMS.show();
   
   gb_ctrl_chkboxPAD.hide();
   gb_ctrl_chkboxMic.hide();
