@@ -119,6 +119,14 @@ Un problema típico en el gamepad, es que se tenga que conectar por usb y descon
 Para el micrófono, se necesita darle el permiso de usar la entrada del mismo.<br>
 Debemos ajustar los niveles tanto de salida como de entrada, para que se detecten bien los tonos.
 La posibilida de de usar un dispositivo HID nos permite no depender de permisos especiales, y nos da más portabilidad. Así mismo, con el truco del mezclador de audio y el ARDUINO, se puede activar un relé sin falta de puerto serie, dandonos la posibilidad de usarlo en transceptores que no disponen de VOX.
+<br>
+A la hora de enviar mensajes, podemos elegir:
+<ul>
+ <li>0 Sin compresión<li>
+ <li>1 Diccionario Español - Reduce a mayúsculas y con un mini diccionario<li>
+ <li>2 LZW - Comprime en LZW<li>
+ <li>Auto - Selecciona el modo que menos ocupa en espacio para enviar<li>
+</ul>
 
 <br><br>
 <a name="opciones"><h2>Opciones</h2></a>
