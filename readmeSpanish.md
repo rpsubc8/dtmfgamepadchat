@@ -122,10 +122,10 @@ La posibilidad de usar un dispositivo HID nos permite no depender de permisos es
 <br>
 A la hora de enviar mensajes, podemos elegir:
 <ul>
- <li>0 Sin compresión<li>
- <li>1 Diccionario Español - Reduce a mayúsculas y con un mini diccionario<li>
- <li>2 LZW - Comprime en LZW<li>
- <li>Auto - Selecciona el modo que menos ocupa en espacio para enviar<li>
+ <li>0 Sin compresión</li>
+ <li>1 Diccionario Español - Reduce a mayúsculas y con un mini diccionario</li>
+ <li>2 LZW - Comprime en LZW</li>
+ <li>Auto - Selecciona el modo que menos ocupa en espacio para enviar</li>
 </ul>
 
 <br><br>
