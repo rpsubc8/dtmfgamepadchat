@@ -12,6 +12,9 @@ const const_max_length_sms = 64; //128 caracters maximos para un sms
 
 //Configuraciones
 var gb_cadPTT = 'DDDD';        //Activar PTT VOX numero de tono D a repetir
+var gb_cadSilenceStart = ''    //Silencio despues de PTT (numero de veces a repetir)
+var gb_cadSilenceEnd = ''      //Silencio antes de finalizar PTT (numero de veces a repetir)
+var gb_cadNoiseEnd = ''        //Ruido antes de finalizar PTT (numero de veces a repetir)
 var gb_log_debug = true;       //Sacamos log de RX y TX true o false
 var gb_fullduplex = true;      //RX y TX al mismo tiempo true o false
 var gb_use_gamepad_dtmf= false //Permite lectura de gamepad MT8870 true o false
@@ -22,11 +25,13 @@ var gb_id_q3 = 6;              //Boton PAD para pin Q3 MT8870
 var gb_id_q2 = 9;              //Boton PAD para pin Q2 MT8870
 var gb_id_q1 = 10;             //Boton PAD para pin Q1 MT8870
 var gb_speed_dtmf = 1;         //Velocidad envio tonos 1 .. 9 (Solo MT8870)
-var gb_use_sms = 1;            //Usar compresion SMS 0,1
+var gb_use_sms = 3;            //Compresion SMS 0(crudo),1(diccionario mayusculas),2(LZW),3(auto)
+var gb_use_relay = true;       //Rele Arduino activado por tono DTMF C
 
 
 
 //Resto variables
+var gb_medir_tx_ini; //Medir tiempo de transmision para Log
 var gb_time_silence = 500;
 var gb_time_sound = 300;
 
@@ -69,7 +74,16 @@ var gb_ctrl_chkbox_fullduplex; //fullduplex
 var gb_ctrl_chkbox_log; //Logger
 var gb_ctrl_lbl_speed_dtmf; //Speed
 var gb_ctrl_input_speed_dtmf; //Speed
-var gb_ctrl_cmbSMS; //Combobox
+var gb_ctrl_cmbSMS; //Combobox SMS 0,1,2,3
+var gb_ctrl_chkboxRelay; //Rele externo activado por Arduino tono dtmf C
+var gb_ctrl_lbl_silenceStart; //Silencio despues de apretar PTT
+var gb_ctrl_input_silenceStart;
+var gb_ctrl_lbl_silenceEnd;   //Silencio antes de soltar PTT
+var gb_ctrl_input_silenceEnd;
+var gb_ctrl_lbl_NoiseEnd;   //Ruido antes de soltar PTT
+var gb_ctrl_input_NoiseEnd;
+
+
 
 var gb_cad_botones='';
 
@@ -178,15 +192,21 @@ function setup() {
   x = Math.trunc(resWidth/1.4);
   y = Math.trunc(resHeight/2.1);  
   gb_ctrl_cmbSMS.position(x, y);
-  gb_ctrl_cmbSMS.option('0');
-  gb_ctrl_cmbSMS.option('1');
+  gb_ctrl_cmbSMS.option('0.RAW');
+  gb_ctrl_cmbSMS.option('1.Diccionario');
+  gb_ctrl_cmbSMS.option('2.LZW');
+  gb_ctrl_cmbSMS.option('3.Auto');
   switch (gb_use_sms)
   {
-   case 0: gb_ctrl_cmbSMS.selected('0');
+   case 0: gb_ctrl_cmbSMS.selected('0.RAW'); //Base64 crudo
     break;
-   case 1: gb_ctrl_cmbSMS.selected('1');
+   case 1: gb_ctrl_cmbSMS.selected('1.Diccionario'); //Diccionario, empaqueta, mayusculas Base64
     break;
-   default: gb_ctrl_cmbSMS.selected('0');
+   case 2: gb_ctrl_cmbSMS.selected('2.LZW'); //LZW Base64
+    break;
+   case 3: gb_ctrl_cmbSMS.selected('3.Auto'); //Auto 0,1,2,3
+    break;		
+   default: gb_ctrl_cmbSMS.selected('0.Sin comprimir');
     break;
   }
   gb_ctrl_cmbSMS.changed(UseSMSEvent);  
@@ -268,13 +288,43 @@ function setup() {
 
   gb_ctrl_lbl_ptt = createElement('h4', 'PTT'); //label
   gb_ctrl_lbl_ptt.position(20,60);
-  gb_ctrl_input_ptt = createInput('2','number'); //PTT num D a enviar
+  gb_ctrl_input_ptt = createInput(gb_cadPTT.length.toString(),'number'); //PTT num D a enviar
   gb_ctrl_input_ptt.position(60, 80);
   gb_ctrl_input_ptt.style('width','40px');
   gb_ctrl_input_ptt.elt.min = 0;
   gb_ctrl_input_ptt.elt.max = 16;    
   gb_ctrl_input_ptt.input(UpdateNumPTT);
   gb_ctrl_input_ptt.elt.value = gb_cadPTT.length.toString();
+  
+  gb_ctrl_lbl_silenceStart = createElement('h4', 'Silence Start'); //label
+  gb_ctrl_lbl_silenceStart.position(200,60);
+  gb_ctrl_input_silenceStart = createInput(gb_cadSilenceStart.length.toString(),'number');
+  gb_ctrl_input_silenceStart.position(290, 80);
+  gb_ctrl_input_silenceStart.style('width','40px');
+  gb_ctrl_input_silenceStart.elt.min = 0;
+  gb_ctrl_input_silenceStart.elt.max = 16;    
+  gb_ctrl_input_silenceStart.input(UpdateSilenceStart);
+  gb_ctrl_input_silenceStart.elt.value = gb_cadSilenceStart.length.toString();
+  
+  gb_ctrl_lbl_silenceEnd = createElement('h4', 'Silence End'); //label
+  gb_ctrl_lbl_silenceEnd.position(200,90);
+  gb_ctrl_input_silenceEnd = createInput(gb_cadSilenceEnd.length.toString(),'number');
+  gb_ctrl_input_silenceEnd.position(290, 110);
+  gb_ctrl_input_silenceEnd.style('width','40px');
+  gb_ctrl_input_silenceEnd.elt.min = 0;
+  gb_ctrl_input_silenceEnd.elt.max = 16;    
+  gb_ctrl_input_silenceEnd.input(UpdateSilenceEnd);
+  gb_ctrl_input_silenceEnd.elt.value = gb_cadSilenceEnd.length.toString();
+  
+  gb_ctrl_lbl_NoiseEnd = createElement('h4', 'Noise End'); //label ruido antes de soltar PTT
+  gb_ctrl_lbl_NoiseEnd.position(200,120);
+  gb_ctrl_input_NoiseEnd = createInput(gb_cadNoiseEnd.length.toString(),'number');
+  gb_ctrl_input_NoiseEnd.position(290, 140);
+  gb_ctrl_input_NoiseEnd.style('width','40px');
+  gb_ctrl_input_NoiseEnd.elt.min = 0;
+  gb_ctrl_input_NoiseEnd.elt.max = 16;    
+  gb_ctrl_input_NoiseEnd.input(UpdateNoiseEnd);
+  gb_ctrl_input_NoiseEnd.elt.value = gb_cadNoiseEnd.length.toString();  
   
   
   gb_ctrl_chkbox_fullduplex = createCheckbox('Full duplex', gb_fullduplex); //TX y RX al mismo tiempo
@@ -296,6 +346,11 @@ function setup() {
   gb_ctrl_input_speed_dtmf.elt.value = gb_speed_dtmf.toString();  
   SpeedEvent(); //Fuerza la velocidad leida
 
+
+  gb_ctrl_chkboxRelay = createCheckbox('Relay PTT', gb_use_relay); //checkbox relay PTT
+  gb_ctrl_chkboxRelay.position(200,20);
+  gb_ctrl_chkboxRelay.changed(RelayEvent);
+
   SelectTabRX(); //Seleccion Recepcion
 	  
   gb_forceDraw = true;
@@ -306,18 +361,88 @@ function setup() {
  }
 }
 
-//Usar compresion SMS
-function UseSMSEvent()
+//Numero de ruido C despues de apretar PTT
+function UpdateNoiseEnd()
 {
  try
  {
-  gb_use_sms = Number(this.elt.value);
-  //alert (gb_use_sms);
+  let numNoise = Number(gb_ctrl_input_NoiseEnd.elt.value);
+  let i=0;
+  gb_cadNoiseEnd = '';
+  for (i=0;i<numNoise;i++)
+  {	  
+   gb_cadNoiseEnd += 'D';
+  }
+ }
+ catch(err)
+ {  
+  DebugLog(err.message.toString());
+ } 		
+}
+
+//Numero de silencios despues de apretar PTT
+function UpdateSilenceStart()
+{
+ try
+ {
+  let numSilence = Number(gb_ctrl_input_silenceStart.elt.value);
+  let i=0;
+  gb_cadSilenceStart = '';
+  for (i=0;i<numSilence;i++)
+  {	  
+   gb_cadSilenceStart += ' ';
+  }
+ }
+ catch(err)
+ {  
+  DebugLog(err.message.toString());
+ } 	
+}
+
+//Numero de silencios antes de soltar PTT
+function UpdateSilenceEnd()
+{
+ try
+ {
+  let numSilence = Number(gb_ctrl_input_silenceEnd.elt.value);
+  let i=0;
+  gb_cadSilenceEnd = '';
+  for (i=0;i<numSilence;i++)
+  {	  
+   gb_cadSilenceEnd += ' ';
+  }
+ }
+ catch(err)
+ {  
+  DebugLog(err.message.toString());
+ } 	
+}
+
+//Usar Relé activar PTT arduino
+function RelayEvent()
+{
+ try
+ {  
+  gb_use_relay = this.checked() ? true : false;  
  }
  catch(err)
  {  
   DebugLog(err.message.toString());
  } 
+}
+
+//Usar compresion SMS
+function UseSMSEvent()
+{
+ try
+ {
+  gb_use_sms = Number(this.elt.value.substr(0,1));
+  //alert (gb_use_sms);
+ }
+ catch(err)
+ {  
+  DebugLog(err.message.toString());
+ }
 }
 
 //Velocidad envio tonos
@@ -714,12 +839,33 @@ function SendTXSMSTipo(tipo)
   let cadToSend = gb_ctrl_areaTX.elt.value;
   switch (tipo)
   {
-   case 0: SendSMSTipo0(cadToSend);
+   case 0: SendSMSTipo0(cadToSend); //Texto Base64 crudo
     break;
-   case 1: SendSMSTipo1(cadToSend);
-    break;	
+   case 1: SendSMSTipo1Serv(cadToSend,'0'); //Diccionario,empaquetado,mayusculas
+    break;
+   case 2: SendSMSTipo1Serv(cadToSend,'2'); //LZW Base64
+    break;
+   case 3: let len = btoa(cadToSend).length; //longitud cadena normal Base64
+    let len0 = btoa(TextoComprimeDiccionario(cadToSend)).length; //longitud diccionario mayusculas Base64
+	let len2 = LZString.compressToBase64(cadToSend).length; //longitud LZW Base64
+	if (len <= len0 && len <= len2)
+	{
+	 SendSMSTipo0(cadToSend); //Normal
+	}
+	else
+	{
+	 if (len0 <= len && len0 <= len2)
+	 {
+	  SendSMSTipo1Serv(cadToSend,'0'); //diccionario
+	 }
+	 else
+	 {
+	  SendSMSTipo1Serv(cadToSend,'2'); //LZW
+	 }
+	}    
+    break;   
    default: SendSMSTipo0(cadToSend);
-    break;	
+    break;
   }
  }
  catch(err)
@@ -748,7 +894,8 @@ function SendSMSTipo0(cadToSend)
  //gb_buf_send_dtmf[0]='#'; 
  try
  {
-  gb_buf_send_dtmf = gb_cadPTT + '#';
+  gb_buf_send_dtmf = (gb_use_relay === true) ? 'C' : '';
+  gb_buf_send_dtmf += gb_cadPTT + gb_cadSilenceStart + '#';
   //gb_buf_send_dtmf = '#';
   let cadLog = '';
   let frameData = '0'; //Tipo 0
@@ -780,6 +927,7 @@ function SendSMSTipo0(cadToSend)
   }
   //gb_buf_send_dtmf[(frameData.length+1)]='*';
   gb_buf_send_dtmf += '*';
+  gb_buf_send_dtmf += gb_cadSilenceEnd + gb_cadNoiseEnd;
   
   cadLog += ' Frame:'+gb_buf_send_dtmf+' Len:'+gb_buf_send_dtmf.length.toString();
   DebugLog(cadLog);
@@ -824,8 +972,8 @@ function FrameGenerateCRC(frameOrigen)
  return aReturn;
 }
 
-//Send SMS de Prueba basica tipo 1 cin longitud y CRC
-function SendSMSTipo1(cadToSend)
+//Send SMS de Prueba basica tipo 1 con longitud y CRC
+function SendSMSTipo1Serv(cadToSend, servicio)
 {
  //#10CRxxYYzz*
  //Tipo:1  
@@ -833,25 +981,35 @@ function SendSMSTipo1(cadToSend)
  //Longitud 00
  //CRC 00
  try
- {  
-  gb_buf_send_dtmf = gb_cadPTT + '#';
+ {
+  gb_buf_send_dtmf = (gb_use_relay === true) ? 'C' : '';
+  gb_buf_send_dtmf += gb_cadPTT + gb_cadSilenceStart + '#';
   let cadLog = '';
   let frameData = '1'; //Tipo 1
   let cadLen = '00'; //Longitud
   let cadCRC = '00';   //CRC
   let cadTX = '';
-  let cadServ = '0'; //Servicio 0 //Diccionario Espaniol
+  //let cadServ = '0'; //Servicio 0 //Diccionario Espaniol
+  let cadServ = servicio;
   let cadCompress = '';
   let cadDTMF = '';
   let encodedString = '';  
   
   cadLog += new Date(Date.now()).toLocaleString('en-GB').replace(',','');
   cadTX = cadLog;
-  cadCompress = TextoComprimeDiccionario(cadToSend);  
-  encodedString = btoa(cadCompress); //Base64  
-  
-    
-  
+  switch (cadServ)
+  {
+   case '0': cadCompress = TextoComprimeDiccionario(cadToSend);  
+    encodedString = btoa(cadCompress); //Base64  
+    break;
+   case '2': cadCompress = cadToSend;
+    encodedString = LZString.compressToBase64(cadToSend); //LZW Base64
+    break;
+   default: cadCompress = TextoComprimeDiccionario(cadToSend);  
+    encodedString = btoa(cadCompress); //Base64  
+    break;
+  }
+           
   cadLen = cadToSend.length.toString().padStart(2, '0');
   let i=0;
   for (i=0;i<encodedString.length;i++)
@@ -866,18 +1024,18 @@ function SendSMSTipo1(cadToSend)
    gb_buf_send_dtmf += frameData[i];
   }  
   gb_buf_send_dtmf += '*';
+  gb_buf_send_dtmf += gb_cadSilenceEnd + gb_cadNoiseEnd;
 
-  cadTX+=' TX(1):' + cadToSend;
+  cadTX+=' TX(1.' + cadServ + '):' + cadToSend;
   UpdateAreaRX(cadTX);
   
-  cadLog += ' TX Type:1 Serv:0 Len:'+ cadLen +' CRC:'+cadCRC;
+  cadLog += ' TX Type:1 Serv:' + cadServ + ' Len:'+ cadLen +' CRC:'+cadCRC;
   cadLog += ' '+cadToSend+' Len:'+cadToSend.length.toString();
   cadLog += ' Compress:'+cadCompress + ' Len:'+cadCompress.length.toString();
   cadLog += ' BASE64:'+encodedString+ ' Len:'+encodedString.length.toString();  
   cadLog += ' DTMF:' + cadDTMF+' Len:'+cadDTMF.length.toString();    
   cadLog += ' Frame:'+gb_buf_send_dtmf+' Len:'+gb_buf_send_dtmf.length.toString();
-    
-  
+      
   DebugLog(cadLog);
  
   gb_total_dtmf_send = gb_buf_send_dtmf.length;
@@ -891,8 +1049,9 @@ function SendSMSTipo1(cadToSend)
  catch(err)
  {
   DebugLog(err.message.toString());
- } 
+ }
 }
+
 
 //function PruebaSendDTMF(){
 // //gb_oscTone1.start();
@@ -1008,6 +1167,7 @@ function TwoKeyDTMFTochar(valor)
    case '1B': aReturn= ',';break;
    case '1C': aReturn= '.';break;
    case '1D': aReturn= '?';break;
+   default: aReturn = ''; break;
   } 
  }
  catch(err)
@@ -1055,6 +1215,7 @@ function CharTo2KeyDTMF(valor)
    case ',': aReturn= '1B';break;
    case '.': aReturn= '1C';break;
    case '?': aReturn= '1D';break;
+   default: aReturn = ''; break;
   }
  }
  catch(err)
@@ -1123,6 +1284,7 @@ function StopSoundDTMF()
 function Poll_DTMFPlaySound()
 {
  let valor='';
+ let gb_aux_tx_time;
  try
  {	
   if (gb_play_dtmf === true)
@@ -1138,7 +1300,21 @@ function Poll_DTMFPlaySound()
     gb_oscTone2.stop();
     let baja= 0;
     let alta= 0;  
-    valor = gb_buf_send_dtmf[gb_current_dtmf_send];  
+    valor = gb_buf_send_dtmf[gb_current_dtmf_send];
+	if (gb_current_dtmf_send === 0)
+	{
+	 gb_medir_tx_ini = Date. now(); //Mide tiempo TX inicio
+	}
+	else
+	{
+	  if (gb_current_dtmf_send === (gb_total_dtmf_send-1))
+	  {
+		gb_aux_tx_time = Date. now() - gb_medir_tx_ini; //Mide tiempo TX inicio		
+		DebugLog ('Time TX:' + gb_aux_tx_time+' ms ' + (Math.round(gb_aux_tx_time/1000))+' s');
+		gb_medir_tx_ini = gb_aux_tx_time;
+		
+	  }
+	}
     switch (valor)
     {
      case '1': baja= 697; alta= 1209; break;
@@ -1157,6 +1333,7 @@ function Poll_DTMFPlaySound()
      case 'B': baja= 770; alta= 1633; break;
      case 'C': baja= 852; alta= 1633; break;
      case 'D': baja= 941; alta= 1633; break;
+	 default: baja= 0; alta= 0; break; //silencio
     }   
     gb_oscTone1.freq(baja);
     gb_oscTone2.freq(alta);
@@ -1230,6 +1407,7 @@ function RowColToDtmf(row,col)
   if ((row === 3) && (col === 1)){return ('0');}
   if ((row === 3) && (col === 2)){return ('#');}
   if ((row === 3) && (col === 3)){return ('D');}
+  return (''); //No devuelve nada
  }
  catch(err)
  {
@@ -1566,9 +1744,9 @@ function ProcesSMSTipo1()
   cadAreaRX = cadLog;
   
   cadLog += 'RX Type:1';
-  cadLog += ' Srv: '+cadServ; //Servicio
-  cadLog += ' Long '+auxCadLen.toString(); //Longitud
-  cadLog += ' CRC '+auxCRC.toString(); //CRC
+  cadLog += ' Srv:'+cadServ; //Servicio
+  cadLog += ' Len:'+auxCadLen.toString(); //Longitud
+  cadLog += ' CRC:'+auxCRC.toString(); //CRC
   cont= 6; //Comienza despues de CRC
   for (i=0; i<auxLen; i++)
   {
@@ -1576,17 +1754,29 @@ function ProcesSMSTipo1()
    cadBase64 += DTMFtoCharBase64(gb_buf_rcv_dtmf[cont] + gb_buf_rcv_dtmf[cont+1]);
    cont += 2;
   }
+    
   cadLog += ' DTMF:'+cadDTMF;
   cadLog += ' BASE64:'+cadBase64+ ' Len:'+auxLen.toString();
-  cadRX = atob(cadBase64); //Base64 decode
-  cadLog += ' RX:' + cadRX + ' Len:' + cadRX.length.toString();
-  cadDecompress = TextoDescomprimeDiccionario(cadRX);
+
+  switch (cadServ)
+  {
+   case '0': cadRX = atob(cadBase64); //Base64 decode   
+    cadDecompress = TextoDescomprimeDiccionario(cadRX);
+    break;
+   case '2': cadRX = LZString.decompressFromBase64 (cadBase64);
+    cadDecompress = cadRX;
+    break;
+   default: cadRX = atob(cadBase64); //Base64 decode
+    break;   
+  }  
+  
+  cadLog += ' RX:' + cadRX + ' Len:' + cadRX.length.toString();  
   cadLog += ' Decompress:' + cadDecompress + ' Len:'+cadDecompress.length.toString();
   cadLog += ' Frame:#' + gb_buf_rcv_dtmf + ' Len:' + (gb_buf_rcv_dtmf.length + 1).toString(); //Aniadido #
   
   DebugLog(cadLog);
   
-  cadAreaRX += ' RX(1):' + cadDecompress;
+  cadAreaRX += ' RX(1.' + cadServ + '):' + cadDecompress;
   UpdateAreaRX(cadAreaRX);
   gb_buf_rcv_dtmf = '';
  }
@@ -1676,7 +1866,16 @@ function SelectTabPAD()
   gb_ctrl_lbl_speed_dtmf.show();
   gb_ctrl_input_speed_dtmf.show();  
   
+  gb_ctrl_chkboxRelay.show();
+  
   gb_ctrl_btnClear.hide();
+  
+ gb_ctrl_lbl_silenceStart.show();
+ gb_ctrl_input_silenceStart.show();
+ gb_ctrl_lbl_silenceEnd.show();
+ gb_ctrl_input_silenceEnd.show();
+ gb_ctrl_lbl_NoiseEnd.show();
+ gb_ctrl_input_NoiseEnd.show();
  }
  catch(err)
  {
@@ -1722,7 +1921,16 @@ function SelectTabRX()
   gb_ctrl_lbl_speed_dtmf.hide();
   gb_ctrl_input_speed_dtmf.hide();
   
+  gb_ctrl_chkboxRelay.hide();
+  
   gb_ctrl_btnClear.show();
+  
+  gb_ctrl_lbl_silenceStart.hide();
+  gb_ctrl_input_silenceStart.hide();
+  gb_ctrl_lbl_silenceEnd.hide();
+  gb_ctrl_input_silenceEnd.hide();
+  gb_ctrl_lbl_NoiseEnd.hide();
+  gb_ctrl_input_NoiseEnd.hide();
  }
  catch(err)
  {
