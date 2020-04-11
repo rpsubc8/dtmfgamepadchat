@@ -19,7 +19,7 @@ Se permiten varios interfaces:
  <li>Micrófono o entrada de linea</li>
  <li>Salida de linea o altavoces</li>
  <li>Joystick o gamepad modificado con MT8870</li>
- <li>Arduino emulando joystick (ARDUINO UNO)</li>
+ <li>Arduino emulando joystick (ARDUINO UNO R3 ATMEGA 16u2 y LEONARDO)</li>
 </ul>
 Aunque el uso del MT8870 implica un poco más de dificultad, se consigue mucha más velocidad y precisión a la hora de decodificar tonos DTMF.
 Gracias al chip MT8870, conectando las salidas de STQ, Q4, Q3, Q2 y Q1 a un transistor permitiendo abrir o cerrar
@@ -46,6 +46,7 @@ Si se dispone de una placa Arduino uno R3 ATMEGA328 con el chip de comunicacione
  <li>q3 - 4</li>
  <li>q2 - 5</li>
  <li>q1 - 6</li>
+ <li>Relé - 7</li>
 </ul> 
 
 Los botones del mando son:
@@ -56,6 +57,7 @@ Los botones del mando son:
  <li>q2 - 9</li>
  <li>q1 - 10</li>
  <li>Flip flop - 11 (botón oscilante para no tener que apretar un botón desde el navegador)</li>
+ <li>Relé PTT - 12 (botón que indica cuando se activa el Rele externo)</li>
 </ul>
 
 Se requiere previamente flashear el chip ATMEGA16u2 con:
@@ -71,6 +73,14 @@ Si queremos otros botones, deberemos modificar el código de ARDUINO:
 #define pad_q2 8
 #define pad_q1 9
 #define pad_switchFlip 10 //boton flipflop pulsado para activar navegador
+#define pad_relay 11 //boton indicando rele
+
+//Delay milliseconds
+#define time_delay 100
+//Maximo tiempo rele activo Timeout milisegundos 120 segundos (2 minutos) * 1000 ms = 120000 ms
+#define time_out_relay 120000
+//Tiempo maximo de silencio milisegundos 1 segundo 1000 ms
+#define time_silence 1000
 </code></pre>
 Se ha forzado por código cambios flip flop del botón 10 para que equivalga a un boton presionado, para que así los navegadores lo detecten en el HTML5, y no haya que pulsar ningún boton, dado que al ser un emulador con ARDUINO, seria dificil de simular.
 <br><br>
