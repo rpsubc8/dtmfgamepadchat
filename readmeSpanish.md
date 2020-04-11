@@ -110,7 +110,7 @@ Debemos mezclar la entrada del módulo MT8870 que decodifica tonos DTMF del aire
 <center><img src="preview/AudioMixerPassive.gif"></center>
 De esta forma, tenemos que mezclar la salida de audio de nuestro talkie, con la salida de la tarjeta de sonido, para luego pasar dicha mezcla por la única entrada del módulo del MT8870.
 El circuito es muy simple y el valor de la resistencia debe ser entre 1K y 10K.
-
+<br><br>
 
 <a name="html5"><h2>HTML5</h2></a>
 Se ha optado por HTML5 (js) para poder conseguir la máxima portabilidad. El interface actual no es el definitivo, dado que se ha usado algo simple para pruebas de funcionalidad.<br>
@@ -134,7 +134,11 @@ Si seleccionamos el botón de TabPAD, podremos acceder a todas las opciones:
  <li>Q4 (botón del PAD para pin Q4 del MT8870)</li>
  <li>Q3 (botón del PAD para pin Q3 del MT8870)</li>
  <li>Q2 (botón del PAD para pin Q2 del MT8870)</li>
- <li>Q1 (botón del PAD para pin Q1 del MT8870)</li> 
+ <li>Q1 (botón del PAD para pin Q1 del MT8870)</li>
+ <li>Relay PTT (activa un relé con el tono DTMF C)</li>
+ <li>Silence Start (Añade un silencio al activar PTT)</li>
+ <li>Silence End (Añade un silencio al finalizar PTT)</li>
+ <li>Noise End (Añade ruido tono DTMF D al finalizar PTT)</li>
 </ul>
 Se puede tener al mismo tiempo activo el Gamepad y Micrófono para poder decodificar al mismo tiempo de ambos sitios, pero lo normal es tener sólo uno activo (el que vayamos a usar).<br>
 El PTT equivale a enviar la tono 'D' tantas veces como este especificado. De esta forma, permitirá abrir el VOX de un talkie.<br>
@@ -146,16 +150,21 @@ Si seleccionamos el código del <b>sketch.js</b> podremos modificar ciertas vari
 <pre><code>
  //Configuraciones
  var gb_cadPTT = 'DDDD';        //Activar PTT VOX numero de tono D a repetir
+ var gb_cadSilenceStart = ''    //Silencio despues de PTT (numero de veces a repetir)
+ var gb_cadSilenceEnd = ''      //Silencio antes de finalizar PTT (numero de veces a repetir)
+ var gb_cadNoiseEnd = ''        //Ruido antes de finalizar PTT (numero de veces a repetir)
  var gb_log_debug = true;       //Sacamos log de RX y TX true o false
  var gb_fullduplex = true;      //RX y TX al mismo tiempo true o false
- var gb_use_gamepad_dtmf= true; //Permite lectura de gamepad MT8870 true o false
- var gb_use_mic_dtmf= false;    //Permite lectura de microfono true o false
+ var gb_use_gamepad_dtmf= false //Permite lectura de gamepad MT8870 true o false
+ var gb_use_mic_dtmf= true;     //Permite lectura de microfono true o false
  var gb_id_stq = 3;             //Boton PAD para pin STQ MT8870
  var gb_id_q4 = 5;              //Boton PAD para pin Q4 MT8870
  var gb_id_q3 = 6;              //Boton PAD para pin Q3 MT8870
  var gb_id_q2 = 9;              //Boton PAD para pin Q2 MT8870
  var gb_id_q1 = 10;             //Boton PAD para pin Q1 MT8870
  var gb_speed_dtmf = 1;         //Velocidad envio tonos 1 .. 9 (Solo MT8870)
+ var gb_use_sms = 3;            //Compresion SMS 0(crudo),1(diccionario mayusculas),2(LZW),3(auto)
+ var gb_use_relay = true;       //Rele Arduino activado por tono DTMF C
 </code></pre>
 <br><br>
 
