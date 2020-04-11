@@ -117,8 +117,8 @@ Se ha optado por HTML5 (js) para poder conseguir la máxima portabilidad. El int
 En HTML5 existen ciertos problemas de permisos, tanto en el uso del micrófono, como el GAMEPAD, que se solucionan de diferente manera, según navegador y dispositivo.<br>
 Un problema típico en el gamepad, es que se tenga que conectar por usb y desconectar cada vez que se tenga que usar o incluso que se tenga que pulsar un botón del gamepad para aceptar permiso en la primera inicialización.<br>
 Para el micrófono, se necesita darle el permiso de usar la entrada del mismo.<br>
-Debemos ajustar los niveles tanto de salida como de entrada, para que se detecten bien los tonos.
-La posibilida de de usar un dispositivo HID nos permite no depender de permisos especiales, y nos da más portabilidad. Así mismo, con el truco del mezclador de audio y el ARDUINO, se puede activar un relé sin falta de puerto serie, dandonos la posibilidad de usarlo en transceptores que no disponen de VOX.
+Debemos ajustar los niveles tanto de salida como de entrada, para que se detecten bien los tonos.<br>
+La posibilidad de de usar un dispositivo HID nos permite no depender de permisos especiales, y nos da más portabilidad. Así mismo, con el truco del mezclador de audio y el ARDUINO, se puede activar un relé sin falta de puerto serie, dandonos la posibilidad de usarlo en transceptores que no disponen de VOX.
 <br>
 A la hora de enviar mensajes, podemos elegir:
 <ul>
