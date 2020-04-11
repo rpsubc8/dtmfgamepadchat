@@ -5,7 +5,8 @@ Envio de SMS's bajo tonos DTMF, con decodificación en tiempo real usando micró
 <ul>
  <li><a href='#interface'>Interface<a/></li>
  <li><a href='#arduino'>ARDUINO UNO HID<a/></li>  
- <li><a href='#leonardo'>ARDUINO LEONARDO HID<a/></li>  
+ <li><a href='#leonardo'>ARDUINO LEONARDO HID<a/></li>
+ <li><a href='#rele'>Relé PTT<a/></li>  
  <li><a href='#html5'>HTML5<a/></li>
  <li><a href='#opciones'>Opciones<a/></li>
  <li><a href='#codigo'>Código</a></li>
@@ -49,6 +50,8 @@ Si se dispone de una placa Arduino uno R3 ATMEGA328 con el chip de comunicacione
  <li>Relé - 7</li>
 </ul> 
 
+<center><img src="preview/arduinoUno.jpg"></center>
+
 Los botones del mando son:
 <ul>
  <li>stq - 3</li>
@@ -89,9 +92,24 @@ Se ha forzado por código cambios flip flop del botón 10 para que equivalga a u
 Si se dispone de una placa Leonardo, siguiendo mismo esquema de botones, y filosofia del Arduino UNO, pero con el código del Leonardo, se puede también emular un joystick.
 Se ha usado las librerías:<br>
 <a href="https://github.com/MHeironimus/ArduinoJoystickLibrary">https://github.com/MHeironimus/ArduinoJoystickLibrary</a>
-
-
 <br><br>
+
+<a name="rele"><h2>Relé PTT</h2></a>
+Desde Arduino UNO y LEONARDO se ha añadido la opción de usar el pin 7 como salida para activar el PTT:
+<center><img src="preview/RelaySolid.jpg"></center>
+<ul>
+ <li>Relé sólido</li>
+ <li>Relé con trigger en lógica LOW (cambiar por código)</li>
+ <li>Relé con trigger en lógica HIGH (cambiar por código)</li> 
+</ul>
+
+<center><img src="preview/arduinoUno.jpg"></center>
+
+Cuando recibimos un tono DTMF C, se activará el relé. Se ha puesto por código un timeout máximo de transmisión de 2 minutos, así como una detección de silencio de 1 segundo. Si se excede ese tiempo, se cerrará el PTT.
+Debemos mezclar la entrada del módulo MT8870 que decodificar tonos DTMF del aire o radio, y la salida de nuestro dispositivo (tarjeta sonido) que genera el tono C para activar el PTT. Se puede usa run mezclador de audio o la mezcla de disposivos de grabación. También podemos usar un circuito básico de mezcla pasiva:
+<center><img src="preview/AudioMixerPassive.gif"></center>
+
+
 <a name="html5"><h2>HTML5</h2></a>
 Se ha optado por HTML5 (js) para poder conseguir la máxima portabilidad. El interface actual no es el definitivo, dado que se ha usado algo simple para pruebas de funcionalidad.<br>
 En HTML5 existen ciertos problemas de permisos, tanto en el uso del micrófono, como el GAMEPAD, que se solucionan de diferente manera, según navegador y dispositivo.<br>
