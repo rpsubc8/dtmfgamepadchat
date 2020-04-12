@@ -105,7 +105,7 @@ Desde Arduino UNO y LEONARDO se ha añadido la opción de usar el pin 7 como sal
 
 <center><img src="preview/arduinoUno.jpg"></center>
 
-Cuando recibimos un tono DTMF C, se activará el relé. Se ha puesto por código un timeout máximo de transmisión de 2 minutos, así como una detección de silencio de 1 segundo. Si se excede ese tiempo, se cerrará el PTT.
+Cuando recibimos un tono DTMF C, se activará el relé, pero lo hará justo cuando termine el tono C (garantiza que no enviamos el tono C al aire). Se ha puesto por código un timeout máximo de transmisión de 2 minutos, así como una detección de silencio de 1 segundo. Si se excede ese tiempo, se cerrará el PTT.
 Debemos mezclar la entrada del módulo MT8870 que decodifica tonos DTMF del aire o radio, y la salida de nuestro dispositivo (tarjeta sonido) que genera el tono C para activar el PTT. Se puede usar un mezclador de audio o la mezcla de disposivos de grabación. También podemos usar un circuito básico de mezcla pasiva:
 <center><img src="preview/AudioMixerPassive.gif"></center>
 De esta forma, tenemos que mezclar la salida de audio de nuestro talkie, con la salida de la tarjeta de sonido, para luego pasar dicha mezcla por la única entrada del módulo del MT8870.
