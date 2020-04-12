@@ -46,8 +46,8 @@ bool switchFlip = false;
 byte cont_switchFlip=0;
 bool activarRelay = false;
 bool DTMFactivo = false;
+bool activarRelayNextCycle = false;
 unsigned long relay_cont_time=0;
-unsigned long relay_time_fin=0;
 unsigned long silencio_cont_time=0;
 
 #undef DEBUG
@@ -154,6 +154,7 @@ void clearButton(joyReport_t *joy, uint8_t button)
 
 void DesactivarPTT()
 {
+ activarRelayNextCycle = false;
  silencio_cont_time = 0;
  relay_cont_time = 0;
  activarRelay = false; 
@@ -166,6 +167,18 @@ void DesactivarPTT()
  clearButton(&joyReport, pad_relay);
 }
 
+//Activa Rele cuando no se escuche ningun tono C
+void ActivarPTT()
+{
+ activarRelayNextCycle = false;
+ #ifdef use_relay_trigger_low
+  digitalWrite(pin_dtmf_relay, LOW); //Activar Rele
+ #endif    
+ #ifdef use_relay_trigger_high
+  digitalWrite(pin_dtmf_relay, HIGH); //Activar Rele
+ #endif     
+ setButton(&joyReport, pad_relay);
+}
 
 void loop() 
 {
@@ -239,21 +252,26 @@ void loop()
      activarRelay = true;   
      relay_cont_time = 0;
     }
+    else
+    {
+     if (activarRelayNextCycle == true)
+     {
+      if (
+          (stq == LOW)
+          ||
+          (stq == HIGH && !(q1 == HIGH && q2 == HIGH && q3 == HIGH && q4 == HIGH))
+         ) 
+      ActivarPTT(); //Activar PTT cuando no se envie ningun tono C
+     }
+    }    
     
     DTMFactivo = (stq == HIGH)?true:false;
 
     if (activarRelay == true)
     {
      relay_cont_time ++;
-     #ifdef use_relay_trigger_low
-      digitalWrite(pin_dtmf_relay, LOW); //Activar Rele
-     #endif    
-     #ifdef use_relay_trigger_high
-      digitalWrite(pin_dtmf_relay, HIGH); //Activar Rele
-     #endif     
-     setButton(&joyReport, pad_relay);
-     relay_time_fin = relay_cont_time * time_delay; //milisegundos   
-     if (relay_time_fin > time_out_relay)
+     activarRelayNextCycle = true;     
+     if ((relay_cont_time * time_delay) > time_out_relay)
      {
       DesactivarPTT();
      }
